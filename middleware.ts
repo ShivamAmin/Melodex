@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { betterFetch } from "@better-fetch/fetch";
 import type { Session } from '@/auth'
 
-const authRoutes = ['/signup', '/login']
+const authRoutes = ['/sign-up', '/sign-in']
 
 export default async function authMiddleware(request: NextRequest) {
     const pathName = request.nextUrl.pathname;
@@ -22,7 +22,7 @@ export default async function authMiddleware(request: NextRequest) {
         if (isAuthRoute) {
             return NextResponse.next();
         }
-        return NextResponse.redirect(new URL(`/login`, request.url));
+        return NextResponse.redirect(new URL(`/sign-in`, request.url));
     }
 
     if (isAuthRoute) {

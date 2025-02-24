@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/loadingButton";
+import { toast } from "sonner"
 
 
 
@@ -37,10 +38,14 @@ const Page = () => {
                 setLoading(true);
             },
             onSuccess: () => {
-                console.log('Successfully registered');
+                toast.success('You have been successfully registered.', {
+                    description: 'Verify your email to complete the registration process'
+                });
             },
             onError: (ctx) => {
-                console.error(ctx);
+                toast.error('Uh oh!', {
+                    description: ctx.error.message,
+                })
             }
         })
         setLoading(false);
@@ -88,8 +93,9 @@ const Page = () => {
                         </form>
                     </Form>
                     <div className="mt-4 text-center text-sm">
-                        <Link href="/login" className="text-primary hover:underline">
-                            Already have an account?
+                        Already have an account? &nbsp;
+                        <Link href="/sign-in" className="text-primary hover:underline">
+                            Sign in!
                         </Link>
                     </div>
                 </CardContent>

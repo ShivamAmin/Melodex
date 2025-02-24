@@ -6,7 +6,7 @@ import {useState} from 'react'
 import {useForm} from "react-hook-form";
 import Link from "next/link";
 import {z} from "zod";
-import {loginSchema} from "@/lib/zod";
+import {signInSchema} from "@/lib/zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {authClient} from "@/auth-client";
 import {useRouter} from "next/navigation";
@@ -14,18 +14,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import LoadingButton from "@/components/loadingButton";
+import { toast } from "sonner"
 
 const Page = () => {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const form = useForm<z.infer<typeof loginSchema>>({
-        resolver: zodResolver(loginSchema),
+    const form = useForm<z.infer<typeof signInSchema>>({
+        resolver: zodResolver(signInSchema),
         defaultValues: {
             email: "",
             password: "",
         }
     });
-    const handleLogin = async (values: z.infer<typeof loginSchema>) => {
+    const handleSignIn = async (values: z.infer<typeof signInSchema>) => {
         await authClient.signIn.email({email: values.email, password: values.password}, {
             onRequest: () => {
                 setLoading(true);
@@ -35,7 +36,7 @@ const Page = () => {
                 router.refresh();
             },
             onError: (ctx) => {
-                console.error(ctx);
+                toast.error('Uh oh!', {description: ctx.error.message});
             }
         });
         setLoading(false);
@@ -45,17 +46,17 @@ const Page = () => {
             <Card className="w-full max-w-md">
                 <CardHeader>
                     <CardTitle className="text-3xl font-bold text-center text-gray-800">
-                        Login to your account
+                        Sign in to your account
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-6">
+                        <form onSubmit={form.handleSubmit(handleSignIn)} className="space-y-6">
                             {['email', 'password'].map((field) => (
                                 <FormField
                                     control={form.control}
                                     key={field}
-                                    name={field as keyof z.infer<typeof loginSchema>}
+                                    name={field as keyof z.infer<typeof signInSchema>}
                                     render={({ field: fieldProps }) => (
                                         <FormItem>
                                             <div className='flex'>
@@ -63,7 +64,7 @@ const Page = () => {
                                                     {field.charAt(0).toUpperCase() + field.slice(1)}
                                                 </FormLabel>
                                                 {field === 'password' && (
-                                                    <Link href='/signup' className="ml-auto inline-block text-sm underline-offset-4 hover:underline">Forgot your password?</Link>
+                                                    <Link href='/sign-up' className="ml-auto inline-block text-sm underline-offset-4 hover:underline">Forgot your password?</Link>
                                                 )}
                                             </div>
                                             <FormControl>
@@ -78,12 +79,12 @@ const Page = () => {
                                     )}
                                 />
                             ))}
-                            <LoadingButton loading={loading} type='submit'>Login</LoadingButton>
+                            <LoadingButton loading={loading} type='submit'>Sign In</LoadingButton>
                         </form>
                     </Form>
                     <div className="mt-4 text-center text-sm">
                         Don't have an account? &nbsp;
-                        <Link href="/signup" className="text-primary hover:underline">
+                        <Link href="/sign-up" className="text-primary hover:underline">
                             Sign up!
                         </Link>
                     </div>
