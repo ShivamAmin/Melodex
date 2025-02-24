@@ -25,7 +25,7 @@ export const signUpSchema = object({
     path: ["confirmPassword"],
 });
 
-export const loginSchema = object({
+export const signInSchema = object({
     email: getEmailSchema(),
     password: getPasswordSchema("password"),
 });
