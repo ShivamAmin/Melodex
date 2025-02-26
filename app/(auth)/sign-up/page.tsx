@@ -46,9 +46,11 @@ const Page = () => {
                 toast.error('Uh oh!', {
                     description: ctx.error.message,
                 })
-            }
+            },
+            onResponse: () => {
+                setLoading(false);
+            },
         })
-        setLoading(false);
     }
     return (
         <div className="grow flex items-center justify-center p-4 h-screen">

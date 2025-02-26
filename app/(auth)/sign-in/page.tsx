@@ -37,9 +37,11 @@ const Page = () => {
             },
             onError: (ctx) => {
                 toast.error('Uh oh!', {description: ctx.error.message});
-            }
+            },
+            onResponse: () => {
+                setLoading(false);
+            },
         });
-        setLoading(false);
     }
     return (
         <div className="grow flex items-center justify-center p-4 h-screen">
@@ -64,7 +66,7 @@ const Page = () => {
                                                     {field.charAt(0).toUpperCase() + field.slice(1)}
                                                 </FormLabel>
                                                 {field === 'password' && (
-                                                    <Link href='/sign-up' className="ml-auto inline-block text-sm underline-offset-4 hover:underline">Forgot your password?</Link>
+                                                    <Link href='/forgot-password' className="ml-auto inline-block text-sm underline-offset-4 hover:underline">Forgot your password?</Link>
                                                 )}
                                             </div>
                                             <FormControl>
