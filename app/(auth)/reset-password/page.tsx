@@ -18,7 +18,6 @@ const Page = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
     const token = searchParams.get("error") ?? searchParams.get("token");
-    // const token = searchParams.get("token");
     const [loading, setLoading] = useState(false);
 
     const form = useForm<z.infer<typeof resetPasswordSchema>>({
