@@ -12,6 +12,13 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: true,
+        sendResetPassword: async ({ user, url }) => {
+            await sendEmail({
+                sendTo: user.email,
+                subject: 'Reset your Melodex password',
+                text: `Click the link to reset your password: ${url}`,
+            })
+        },
     },
     emailVerification: {
         sendOnSignUp: true,
