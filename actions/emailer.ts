@@ -21,7 +21,7 @@ export const sendEmail = async ({sendTo, subject, text, html}:{sendTo: string, s
     try {
         await transporter.verify();
     } catch {
-        console.log('Unable to authenticate');
+        console.error('Unable to authenticate');
         return;
     }
     return await transporter.sendMail({
