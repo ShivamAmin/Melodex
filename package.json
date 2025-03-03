@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "genver": "npx genversion utils/version.js",
+    "dev": "npm run genver && next dev --turbopack",
+    "build": "npm run genver && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -19,6 +20,7 @@
     "@prisma/client": "^6.4.1",
     "@radix-ui/react-label": "^2.1.2",
     "better-auth": "^1.1.19",
+    "bowser": "^2.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
@@ -32,7 +34,7 @@
     "sonner": "^2.0.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
-    "uuid": "^11.0.5",
+    "uuid": "^11.1.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
@@ -44,6 +46,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "genversion": "^3.2.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
