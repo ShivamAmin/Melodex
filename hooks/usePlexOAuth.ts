@@ -1,7 +1,8 @@
-import {useRef} from "react";
-import {v4 as uuidv4} from "uuid";
+import { useRef } from "react";
+import { v4 as uuidv4 } from "uuid";
 import Bowser from 'bowser';
 import version from '@/utils/version';
+import Cookies from 'js-cookie';
 
 interface PlexHeaders extends Record<string, string> {
     Accept: string;
@@ -39,7 +40,7 @@ const usePlexOAuth = () => {
         'X-Plex-Language': 'en',
     });
     const plexPin = useRef<PlexPin>({id: 0, code: ''});
-    const plexAuthToken = useRef<string | null>(null);
+    const plexAuthToken = useRef<string | undefined>(Cookies.get('plex_auth_token'));
     const loginPopup = useRef<Window | null>(null);
 
     const setHeaders = () => {
@@ -90,7 +91,7 @@ const usePlexOAuth = () => {
         const x = window.outerWidth / 2 + window.screenX - (w / 2);
 
         const newWindow = window.open(
-            '/connections/loader?service=plex',
+            '/user/connections/loader?service=plex',
             title,
             `
               scrollbars=yes,
@@ -135,6 +136,7 @@ const usePlexOAuth = () => {
                 const resp = await fetch(`https://plex.tv/api/v2/pins/${plexPin.current.id}`, {headers: plexHeaders.current}).then(res => res.json());
                 if (resp?.authToken) {
                     plexAuthToken.current = resp.authToken as string;
+                    Cookies.set('plex_auth_token', plexAuthToken.current);
                     closeLoginPopup();
                     resolve(plexAuthToken.current)
                 } else if (!resp?.authToken && !loginPopup.current?.closed) {
