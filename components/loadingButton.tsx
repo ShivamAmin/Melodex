@@ -6,14 +6,16 @@ const LoadingButton = ({
    type,
    children,
    onClick,
+   disabled,
 }: {
     loading: boolean,
     type: 'button' | 'submit' | 'reset';
     children: ReactNode,
-    onClick?: () => void
+    onClick?: () => void,
+    disabled?: boolean,
 }) => {
     return (
-        <Button onClick={onClick} className="w-full" type={type} disabled={loading}>
+        <Button onClick={onClick} className="w-full" type={type} disabled={disabled || loading}>
             {loading ? (
                 <div className="flex items-center justify-center">
                     <svg

@@ -39,6 +39,9 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 ## Prisma
+ Generate Client (If you delete node_modules, or it's missing)
+`npx prisma generate`
+
  Create initial migration file
 `npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > prisma/migrations/0_init/migration.sql`
  
