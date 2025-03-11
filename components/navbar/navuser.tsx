@@ -28,6 +28,8 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
+import { authClient } from '@/auth-client';
+import {useRouter} from "next/navigation";
 
 export const NavUser = ({ user }: {
     user: {
@@ -36,7 +38,13 @@ export const NavUser = ({ user }: {
         avatar: string
     }
 }) => {
+    const router = useRouter();
     const { isMobile } = useSidebar();
+    const signOut = async () => {
+        await authClient.signOut();
+        router.push("/");
+        router.refresh();
+    }
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -84,12 +92,12 @@ export const NavUser = ({ user }: {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                                <Link href={'/user/settings'}>
-                            <DropdownMenuItem>
-                                <BadgeCheck />
-                                Account
-                            </DropdownMenuItem>
-                                </Link>
+                            <Link href={'/user/settings'}>
+                                <DropdownMenuItem>
+                                    <BadgeCheck />
+                                    Account
+                                </DropdownMenuItem>
+                            </Link>
                             <DropdownMenuItem>
                                 <CreditCard />
                                 Billing
@@ -100,7 +108,7 @@ export const NavUser = ({ user }: {
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={signOut}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>

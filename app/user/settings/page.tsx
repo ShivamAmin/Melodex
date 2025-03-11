@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useState } from 'react'
-import Header from '@/components/header';
-import Content from "@/components/content";
+import Main from '@/components/page/main';
+import Header from '@/components/page/header';
+import Content from "@/components/page/content";
 import LoadingButton from "@/components/loadingButton";
 import usePlexOAuth from "@/hooks/usePlexOAuth";
 import { toast } from "sonner";
@@ -25,12 +26,12 @@ function Page() {
         }, 2000);
     }
     return (
-        <>
+        <Main>
             <Header>Settings Page</Header>
             <Content>
                 <LoadingButton onClick={() => getPlexToken()} loading={loading} type={'button'} disabled={!!plexAuthToken}>Plex</LoadingButton>
             </Content>
-        </>
+        </Main>
     )
 }
 
