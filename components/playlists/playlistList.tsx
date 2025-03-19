@@ -9,19 +9,28 @@ function PlaylistList() {
     const [playlists, setPlaylists] = useState([]);
     const { plexAuthToken } = usePlexOAuth();
     useEffect(() => {
+        const controller = new AbortController();
         const getPlaylists = async () => {
             const url = "https://plex.shivamamin.com/playlists?playlistType=audio"
-            return await fetch(url, {
-                method: "GET",
-                headers: {
-                    Accept: "application/json",
-                    'X-Plex-Token': plexAuthToken!
-                }
-            })
-                .then((res) => res.json())
-                .then((data) => setPlaylists(data.MediaContainer.Metadata));
+            try {
+                return await fetch(url, {
+                    signal: controller.signal,
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        'X-Plex-Token': plexAuthToken!
+                    }
+                })
+                    .then((res) => res.json())
+                    .then((data) => setPlaylists(data.MediaContainer.Metadata))
+                    .then(() => setLoading(prev => !prev));
+            } catch (e) {
+            }
         }
-        getPlaylists().then(() => setLoading(false));
+        getPlaylists();
+        return () => {
+            controller.abort('Request cancelled unexpectedly');
+        };
     }, []);
 
     return (

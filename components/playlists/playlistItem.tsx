@@ -16,19 +16,27 @@ function PlaylistItem({ playlist }: { playlist: any }) {
     const [imageSRC, setImageSRC] = useState<string>('');
     const { plexAuthToken } = usePlexOAuth();
     useEffect(() => {
-        setLoading(true);
+        const controller = new AbortController();
         const getImage = async () => {
             const imageUrl = playlist.thumb ? playlist.thumb : playlist.composite;
-            await fetch('https://plex.shivamamin.com' + imageUrl, {
-                method: 'GET',
-                headers: {
-                    'X-Plex-Token': plexAuthToken!,
-                }
-            })
-                .then(res => res.blob())
-                .then(blob => setImageSRC(URL.createObjectURL(blob)));
+            try {
+                await fetch('https://plex.shivamamin.com' + imageUrl, {
+                    signal: controller.signal,
+                    method: 'GET',
+                    headers: {
+                        'X-Plex-Token': plexAuthToken!,
+                    }
+                })
+                    .then(res => res.blob())
+                    .then(blob => setImageSRC(URL.createObjectURL(blob)))
+                    .then(() => setLoading(prev => !prev));
+            } catch (e) {
+            }
         }
-        getImage().then(() => setLoading(false));
+        getImage();
+        return () => {
+            controller.abort('Request cancelled unexpectedly');
+        };
     }, []);
     return (
         <Card className={`w-[280px] overflow-hidden`}>
