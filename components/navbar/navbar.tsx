@@ -30,7 +30,9 @@ const Navbar = () => {
     const {
         data: session,
     } = authClient.useSession();
+
     if (!session) return <></>;
+
     return (
         <Sidebar collapsible={"icon"} >
             <SidebarHeader>
