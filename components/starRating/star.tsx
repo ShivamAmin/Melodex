@@ -1,18 +1,13 @@
 import star from '@/types/star'
 import { MouseEvent } from 'react';
 
-function Star({onRate, fill, onHover, onHoverOut, starColour, size}: star) {
-    const starStyle = {
-        width: `${size}px`,
-        height: `${size}px`,
-        display: "block",
-        // cursor: "pointer",
-    };
+function Star({ onRate, fill, onHover, onHoverOut, starColour }: star) {
 
     const getSide = (e: MouseEvent) => {
         const element = e.target as HTMLElement;
         const boundingRect = element.getBoundingClientRect();
         const centerX = boundingRect.left + (boundingRect.width / 2);
+
         if (e.clientX < centerX) {
             return('left')
         } else {
@@ -30,9 +25,9 @@ function Star({onRate, fill, onHover, onHoverOut, starColour, size}: star) {
 
     return (
         <span
-            style={starStyle}
-            onClick={(e) => mouseClick(e)}
-            onMouseMove={(e) => mouseMove(e)}
+            className={'w-[18px] h-[18px] block cursor-pointer'}
+            onClick={(e: MouseEvent) => mouseClick(e)}
+            onMouseMove={(e: MouseEvent) => mouseMove(e)}
             onMouseLeave={() => onHoverOut()}
         >
             {fill === 'half' ? (
