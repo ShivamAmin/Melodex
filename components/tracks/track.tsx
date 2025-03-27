@@ -1,5 +1,3 @@
-"use client"
-
 import  track  from '@/types/track';
 import {
     Card,
@@ -7,22 +5,8 @@ import {
 } from '@/components/ui/card';
 import PlexImage from "@/components/plexImage";
 import StarRating from "@/components/starRating/starRating";
-import usePlexOAuth from "@/hooks/usePlexOAuth";
 
 function Track({ track }: { track: track }) {
-    const { plexAuthToken } = usePlexOAuth();
-    const rate = async (rating: number) => {
-        //extract to server action so this component can be a server component
-        const ratingUrl = `https://plex.shivamamin.com/library/sections/${track.librarySectionID}/all?type=10&id=${track.ratingKey}&userRating.value=${rating}`;
-        if (plexAuthToken) {
-            await fetch(ratingUrl, {
-                method: "PUT",
-                headers: {
-                    'X-Plex-Token': plexAuthToken
-                }
-            })
-        }
-    }
     return (
         <Card className={'overflow-hidden h-[80px]'}>
             <CardContent className={'h-full w-full p-0'}>
@@ -39,7 +23,7 @@ function Track({ track }: { track: track }) {
                         </div>
                     </div>
                     <div className={'h-full flex justify-center items-center'}>
-                        <StarRating onSetRating={(rating: number) => rate(rating)} initialRating={track.userRating} />
+                        <StarRating initialRating={track.userRating} librarySectionID={track.librarySectionID} ratingKey={track.ratingKey} />
                     </div>
                 </div>
             </CardContent>
