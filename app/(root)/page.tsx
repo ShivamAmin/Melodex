@@ -7,7 +7,7 @@ const Page = () => {
     return (
         <Main>
             <Header>Home Page</Header>
-            <Content>Some content</Content>
+            <Content>To be determined. What even should be here?</Content>
         </Main>
     )
 }
