@@ -1,4 +1,6 @@
 type starRating = {
+    librarySectionID: number,
+    ratingKey: string,
     max?: number,
     starColour?: string,
     size?: number,

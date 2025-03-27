@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendEmail = async ({sendTo, subject, text, html}:{sendTo: string, subject: string, text: string, html?: string}) => {
+export const sendEmail = async ({ sendTo, subject, text, html }: { sendTo: string, subject: string, text: string, html?: string }) => {
     try {
         await transporter.verify();
     } catch {

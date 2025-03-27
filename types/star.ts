@@ -4,7 +4,6 @@ type star = {
     onHover: (side: string) => void,
     onHoverOut: () => void,
     starColour: string,
-    size: number,
 }
 
 export default star
