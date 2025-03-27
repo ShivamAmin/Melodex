@@ -3,10 +3,7 @@
 import  track  from '@/types/track';
 import {
     Card,
-    CardHeader,
     CardContent,
-    CardTitle,
-    CardDescription,
 } from '@/components/ui/card';
 import PlexImage from "@/components/plexImage";
 import StarRating from "@/components/starRating/starRating";
@@ -15,6 +12,7 @@ import usePlexOAuth from "@/hooks/usePlexOAuth";
 function Track({ track }: { track: track }) {
     const { plexAuthToken } = usePlexOAuth();
     const rate = async (rating: number) => {
+        //extract to server action so this component can be a server component
         const ratingUrl = `https://plex.shivamamin.com/library/sections/${track.librarySectionID}/all?type=10&id=${track.ratingKey}&userRating.value=${rating}`;
         if (plexAuthToken) {
             await fetch(ratingUrl, {
