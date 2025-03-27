@@ -28,6 +28,8 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link";
+import { authClient } from '@/auth-client';
+import {useRouter} from "next/navigation";
 
 export const NavUser = ({ user }: {
     user: {
@@ -36,7 +38,26 @@ export const NavUser = ({ user }: {
         avatar: string
     }
 }) => {
+    const router = useRouter();
     const { isMobile } = useSidebar();
+
+    const signOut = async () => {
+        await authClient.signOut();
+        router.push("/");
+        router.refresh();
+    }
+
+    const userInitials = (name: string): string => {
+        const tmp: string[] = name.split(' ');
+        let initials: string;
+        if (tmp.length === 3) {
+            initials = tmp[0][0].toUpperCase() + tmp[1][0].toUpperCase() + tmp[2][0].toUpperCase();
+        } else {
+            initials = tmp[0][0].toUpperCase() + tmp[tmp.length - 1][0].toUpperCase();
+        }
+        return initials;
+    }
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -48,7 +69,7 @@ export const NavUser = ({ user }: {
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                <AvatarFallback className="rounded-lg">{userInitials(user.name)}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">{user.name}</span>
@@ -67,7 +88,7 @@ export const NavUser = ({ user }: {
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
                                     <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                    <AvatarFallback className="rounded-lg">{userInitials(user.name)}</AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">{user.name}</span>
@@ -84,12 +105,12 @@ export const NavUser = ({ user }: {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                                <Link href={'/user/settings'}>
-                            <DropdownMenuItem>
-                                <BadgeCheck />
-                                Account
-                            </DropdownMenuItem>
-                                </Link>
+                            <Link href={'/user/settings'}>
+                                <DropdownMenuItem>
+                                    <BadgeCheck />
+                                    Account
+                                </DropdownMenuItem>
+                            </Link>
                             <DropdownMenuItem>
                                 <CreditCard />
                                 Billing
@@ -100,7 +121,7 @@ export const NavUser = ({ user }: {
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={signOut}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>

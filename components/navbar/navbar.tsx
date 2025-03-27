@@ -31,6 +31,8 @@ const Navbar = () => {
         data: session,
     } = authClient.useSession();
 
+    if (!session) return <></>;
+
     return (
         <Sidebar collapsible={"icon"} >
             <SidebarHeader>
@@ -54,10 +56,8 @@ const Navbar = () => {
                 <NavMain items={navItems} />
             </SidebarContent>
             <SidebarFooter>
-                {session ? (
+                {session && (
                     <NavUser user={{name: session.user.name, email: session.user.email, avatar: session.user.image || ''}} />
-                ) : (
-                    <>Login Now</>
                 )}
             </SidebarFooter>
             <SidebarRail />
