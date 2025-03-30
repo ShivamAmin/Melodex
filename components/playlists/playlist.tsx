@@ -17,7 +17,7 @@ function Playlist({ playlist }: { playlist: playlist }) {
                     <PlexImage src={playlist.thumb ? playlist.thumb : playlist.composite} alt={playlist.title} fill />
                     <div className={'absolute inset-0 flex flex-col items-center justify-end gap-2 p-2 bg-black bg-opacity-25 hover:bg-opacity-50'}>
                             <div className={'absolute inset-0 flex justify-end p-2'}>
-                                <EditPlaylistMetadata title={playlist.title} description={playlist.summary}  />
+                                <EditPlaylistMetadata ratingKey={playlist.ratingKey} title={playlist.title} description={playlist.summary} />
                             </div>
                         <CardTitle className={'text-white [text-shadow:_black_0px_0px_10px]'}>
                             {playlist.title}
