@@ -42,7 +42,9 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                 }
             }).then(resp => resp.json());
             setPosters(req.MediaContainer.Metadata);
-            setOriginalSelectedPosterKey(req.MediaContainer.Metadata.find((p: poster) => p.selected).key);
+            const selectedPosterKey = req.MediaContainer.Metadata.find((p: poster) => p.selected).key
+            setOriginalSelectedPosterKey(selectedPosterKey);
+            setSelectedPosterKey(selectedPosterKey);
         }
     }
 
@@ -156,6 +158,13 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         }
     }
 
+    const hasUpdates = () => {
+        const titleUpdated = !(localTitle !== title && localTitle !== '');
+        const descriptionUpdated = !(localDescription !== description && localDescription !== '');
+        const posterUpdated = !(originalSelectedPosterKey !== selectedPosterKey);
+        return titleUpdated && descriptionUpdated && posterUpdated;
+    }
+
     return (
         <Dialog onOpenChange={(open: boolean) => handleOpen(open)}>
             <div onClick={preventDefault}>
@@ -195,7 +204,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                             </div>
                         </DialogDescription>
                         <DialogFooter>
-                            <Button onClick={updatePlaylist}>Update Playlist</Button>
+                            <Button disabled={hasUpdates()} onClick={updatePlaylist}>Update Playlist</Button>
                         </DialogFooter>
                     </DialogHeader>
                 </DialogContent>
