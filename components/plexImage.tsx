@@ -4,6 +4,7 @@ import Image, { ImageProps } from "next/image";
 import { Skeleton } from '@/components/ui/skeleton';
 import usePlexOAuth from "@/hooks/usePlexOAuth";
 import { useState, useEffect } from "react";
+// import {cn} from "@/lib/utils";
 
 function PlexImage(props: ImageProps) {
     const { src, ...restProps } = props;
@@ -48,7 +49,7 @@ function PlexImage(props: ImageProps) {
         if (restProps?.fill) {
             return <Skeleton className={'absolute w-full h-full inset-0'} />;
         } else {
-            return <Skeleton className={'w-full h-full'} />;
+            return <Skeleton style={{height: `${restProps.height}px`, width: `${restProps.width}px`}} />;
         }
     }
 
