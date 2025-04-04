@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, ChangeEvent } from "react";
 import { SquarePen } from "lucide-react";
 import {
     Dialog,
@@ -9,7 +9,6 @@ import {
     DialogTitle,
     DialogDescription,
     DialogFooter,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -19,20 +18,28 @@ import PlexImage from "@/components/plexImage";
 import usePlexOAuth from "@/hooks/usePlexOAuth";
 import poster from '@/types/poster';
 import { cn } from '@/lib/utils';
+import LoadingButton from "@/components/loadingButton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: string, title: string, description: string }) {
     const { plexAuthToken } = usePlexOAuth();
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [postersLoading, setPostersLoading] = useState(false);
     const [localTitle, setLocalTitle] = useState<string>('');
     const [localDescription, setLocalDescription] = useState<string>('');
     const [originalSelectedPosterKey, setOriginalSelectedPosterKey] = useState<string>('');
     const [selectedPosterKey, setSelectedPosterKey] = useState<string>('');
     const [posters, setPosters] = useState<poster[]>([]);
+    const [showPosterUrlInput, setShowPosterUrlInput] = useState<boolean>(false);
+    const [externalPosterUrl, setExternalPosterUrl] = useState<string>('');
 
     const preventDefault = (e: MouseEvent) => {
         e.preventDefault();
     }
 
     const getPosters = async () => {
+        setPostersLoading(true);
         const url = `https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`;
         if (plexAuthToken) {
             const req = await fetch(url, {
@@ -45,6 +52,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             const selectedPosterKey = req.MediaContainer.Metadata.find((p: poster) => p.selected).key
             setOriginalSelectedPosterKey(selectedPosterKey);
             setSelectedPosterKey(selectedPosterKey);
+            setPostersLoading(false);
         }
     }
 
@@ -58,93 +66,112 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         toBeUnselected.selected = false;
         tmp[toBeSelectedIdx] = toBeSelected;
         tmp[toBeUnselectedIdx] = toBeUnselected;
-        setSelectedPosterKey(toBeSelected.key);
+        setSelectedPosterKey(toBeSelected.ratingKey);
         setPosters(tmp);
     }
 
-    const uploadPoster = () => {
-        //by url
-        // fetch("https://192-168-0-3.a364f0e5bc984b849af183f41f722bc0.plex.direct:32400/library/metadata/1000003/posters?url=https%3A%2F%2Fi.imgur.com%2FSVnmrva.jpeg&X-Plex-Product=Plex%20Web&X-Plex-Version=4.145.1&X-Plex-Client-Identifier=8wab5v00c8wycfxpsnvtka0d&X-Plex-Platform=Chrome&X-Plex-Platform-Version=134.0&X-Plex-Features=external-media%2Cindirect-media%2Chub-style-list&X-Plex-Model=bundled&X-Plex-Device=Windows&X-Plex-Device-Name=Chrome&X-Plex-Device-Screen-Resolution=1438x1094%2C1440x2560&X-Plex-Token=686ZpuX74RxGxGeE5qrG&X-Plex-Language=en&X-Plex-Session-Id=c5a7fbdd-611f-418c-892e-c2d73f01de01", {
-        //     "headers": {
-        //         "accept": "text/plain, */*; q=0.01",
-        //         "accept-language": "en",
-        //         "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-        //         "sec-ch-ua-mobile": "?0",
-        //         "sec-ch-ua-platform": "\"Windows\"",
-        //         "sec-fetch-dest": "empty",
-        //         "sec-fetch-mode": "cors",
-        //         "sec-fetch-site": "cross-site"
-        //     },
-        //     "referrer": "https://plex.shivamamin.com/",
-        //     "referrerPolicy": "strict-origin-when-cross-origin",
-        //     "body": null,
-        //     "method": "POST",
-        //     "mode": "cors",
-        //     "credentials": "omit"
-        // });
-        //by image
-        // fetch("https://192-168-0-3.a364f0e5bc984b849af183f41f722bc0.plex.direct:32400/library/metadata/1000003/posters?X-Plex-Product=Plex%20Web&X-Plex-Version=4.145.1&X-Plex-Client-Identifier=8wab5v00c8wycfxpsnvtka0d&X-Plex-Platform=Chrome&X-Plex-Platform-Version=134.0&X-Plex-Features=external-media%2Cindirect-media%2Chub-style-list&X-Plex-Model=bundled&X-Plex-Device=Windows&X-Plex-Device-Name=Chrome&X-Plex-Device-Screen-Resolution=1438x1094%2C1440x2560&X-Plex-Token=686ZpuX74RxGxGeE5qrG&X-Plex-Language=en&X-Plex-Session-Id=c5a7fbdd-611f-418c-892e-c2d73f01de01", {
-        //     "headers": {
-        //         "accept": "text/plain, */*; q=0.01",
-        //         "accept-language": "en",
-        //         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        //         "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-        //         "sec-ch-ua-mobile": "?0",
-        //         "sec-ch-ua-platform": "\"Windows\"",
-        //         "sec-fetch-dest": "empty",
-        //         "sec-fetch-mode": "cors",
-        //         "sec-fetch-site": "cross-site"
-        //     },
-        //     "referrer": "https://plex.shivamamin.com/",
-        //     "referrerPolicy": "strict-origin-when-cross-origin",
-        //     "method": "POST",
-        //     "mode": "cors",
-        //     "credentials": "omit"
-        // });
+    const uploadPosterByURL = async () => {
+        const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`);
+        posterUrl.searchParams.append("url", externalPosterUrl);
+        if (plexAuthToken) {
+            await fetch(posterUrl, {
+                method: "POST",
+                headers: {
+                    'X-Plex-Token': plexAuthToken
+                }
+            });
+            getPosters();
+            setExternalPosterUrl('');
+            console.log('uploadPosterByURL()')
+            setOpen(false);
+        }
+    }
+
+    const uploadPosterByImages = async (e: ChangeEvent<HTMLInputElement>) => {
+        const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`);
+        if (e.target.files?.length && plexAuthToken) {
+            const files = Array.from(e.target.files)
+
+            await Promise.all(files.map(file => {
+                const fr = new FileReader();
+                fr.readAsArrayBuffer(file);
+                return fr.onload = () => {
+                    return fetch(posterUrl, {
+                        method: "POST",
+                        headers: {
+                            'X-Plex-Token': plexAuthToken
+                        },
+                        body: fr.result
+                    })
+                }
+            })).then(values => {
+                console.log(values);
+                getPosters();
+            })
+
+            for (let i = 0; i < e.target.files?.length; i++) {
+                const fr = new FileReader();
+                fr.readAsArrayBuffer(e.target.files[i]);
+                fr.onload = async () => {
+                    if (fr.result) {
+                        await fetch(posterUrl, {
+                            method: "POST",
+                            headers: {
+                                'X-Plex-Token': plexAuthToken
+                            },
+                            body: fr.result
+                        }).then(() => getPosters())
+                    }
+                }
+                fr.onerror = () => {
+                    console.log(fr.error);
+                }
+                console.log();
+            }
+        }
     }
 
     const updatePlaylist = async () => {
-        console.log('Should update poster: ', originalSelectedPosterKey !== selectedPosterKey)
-        //req 1:
-        // fetch("https://192-168-0-3.a364f0e5bc984b849af183f41f722bc0.plex.direct:32400/playlists/1000003?title=Test%20playlist%20name%20change&summary=This%20is%20a%20test%20playlist%20to%20test%20Melodex.%20summary%20change&X-Plex-Product=Plex%20Web&X-Plex-Version=4.145.1&X-Plex-Client-Identifier=8wab5v00c8wycfxpsnvtka0d&X-Plex-Platform=Chrome&X-Plex-Platform-Version=134.0&X-Plex-Features=external-media%2Cindirect-media%2Chub-style-list&X-Plex-Model=bundled&X-Plex-Device=Windows&X-Plex-Device-Name=Chrome&X-Plex-Device-Screen-Resolution=1438x1094%2C1440x2560&X-Plex-Token=686ZpuX74RxGxGeE5qrG&X-Plex-Language=en&X-Plex-Session-Id=c5a7fbdd-611f-418c-892e-c2d73f01de01&X-Plex-Drm=widevine&X-Plex-Text-Format=plain&X-Plex-Provider-Version=7.2", {
-        //     "headers": {
-        //         "accept": "application/json",
-        //         "accept-language": "en",
-        //         "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-        //         "sec-ch-ua-mobile": "?0",
-        //         "sec-ch-ua-platform": "\"Windows\"",
-        //         "sec-fetch-dest": "empty",
-        //         "sec-fetch-mode": "cors",
-        //         "sec-fetch-site": "cross-site"
-        //     },
-        //     "referrer": "https://plex.shivamamin.com/",
-        //     "referrerPolicy": "strict-origin-when-cross-origin",
-        //     "body": null,
-        //     "method": "PUT",
-        //     "mode": "cors",
-        //     "credentials": "omit"
-        // });
-        if (originalSelectedPosterKey !== selectedPosterKey) {
-            //update poster:
-            // fetch("https://192-168-0-3.a364f0e5bc984b849af183f41f722bc0.plex.direct:32400/library/metadata/1000003/poster?url=default%3A%2F%2F&X-Plex-Product=Plex%20Web&X-Plex-Version=4.145.1&X-Plex-Client-Identifier=8wab5v00c8wycfxpsnvtka0d&X-Plex-Platform=Chrome&X-Plex-Platform-Version=134.0&X-Plex-Features=external-media%2Cindirect-media%2Chub-style-list&X-Plex-Model=bundled&X-Plex-Device=Windows&X-Plex-Device-Name=Chrome&X-Plex-Device-Screen-Resolution=1438x1094%2C1440x2560&X-Plex-Token=686ZpuX74RxGxGeE5qrG&X-Plex-Language=en&X-Plex-Session-Id=c5a7fbdd-611f-418c-892e-c2d73f01de01", {
-            //     "headers": {
-            //         "accept": "text/plain, */*; q=0.01",
-            //         "accept-language": "en",
-            //         "sec-ch-ua": "\"Chromium\";v=\"134\", \"Not:A-Brand\";v=\"24\", \"Google Chrome\";v=\"134\"",
-            //         "sec-ch-ua-mobile": "?0",
-            //         "sec-ch-ua-platform": "\"Windows\"",
-            //         "sec-fetch-dest": "empty",
-            //         "sec-fetch-mode": "cors",
-            //         "sec-fetch-site": "cross-site"
-            //     },
-            //     "referrer": "https://plex.shivamamin.com/",
-            //     "referrerPolicy": "strict-origin-when-cross-origin",
-            //     "body": null,
-            //     "method": "PUT",
-            //     "mode": "cors",
-            //     "credentials": "omit"
-            // });
+        setLoading(true);
+        if (shouldTitleUpdate() || shouldDescriptionUpdate()) {
+            const metadataUrl = new URL(`https://plex.shivamamin.com/playlists/${ratingKey}`);
+            shouldTitleUpdate() && metadataUrl.searchParams.append("title", localTitle);
+            shouldDescriptionUpdate() && metadataUrl.searchParams.append("summary", localDescription);
+            if (plexAuthToken) {
+                setLoading(true);
+                await fetch(metadataUrl.toString(), {
+                    method: "PUT",
+                    headers: {
+                        'X-Plex-Token': plexAuthToken
+                    }
+                })
+            }
         }
+        if (shouldPosterUpdate()) {
+            const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/poster`);
+            posterUrl.searchParams.append("url", selectedPosterKey);
+            if (plexAuthToken) {
+                await fetch(posterUrl.toString(), {
+                    method: "PUT",
+                    headers: {
+                        'X-Plex-Token': plexAuthToken
+                    }
+                })
+            }
+        }
+        setTimeout(() => {
+            setOpen(false);
+            setTimeout(() => {
+                setLocalTitle('');
+                setLocalDescription('');
+                setLoading(false);
+            }, 100)
+        }, 500)
+    }
+
+    const initialize = () => {
+        setOpen(true);
+        getPosters();
     }
 
     const handleOpen = (open: boolean) => {
@@ -152,61 +179,133 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             setTimeout(() => {
                 setLocalTitle('');
                 setLocalDescription('');
+                console.log('handleOpen()')
+                setOpen(false);
             }, 100);
         } else {
             getPosters();
         }
     }
 
-    const hasUpdates = () => {
-        const titleUpdated = !(localTitle !== title && localTitle !== '');
-        const descriptionUpdated = !(localDescription !== description && localDescription !== '');
-        const posterUpdated = !(originalSelectedPosterKey !== selectedPosterKey);
-        return titleUpdated && descriptionUpdated && posterUpdated;
+    const shouldTitleUpdate = () => {
+        return localTitle !== title && localTitle !== '';
+    }
+
+    const shouldDescriptionUpdate = () => {
+        return localDescription !== description && localDescription !== '';
+    }
+
+    const shouldPosterUpdate = () => {
+        return originalSelectedPosterKey !== selectedPosterKey;
+    }
+
+
+    const shouldButtonBeDisabled = () => {
+        return !shouldTitleUpdate() && !shouldDescriptionUpdate() && !shouldPosterUpdate();
+    }
+
+    const handleDragEnter = (e: MouseEvent) => {
+        console.log(e.target)
     }
 
     return (
-        <Dialog onOpenChange={(open: boolean) => handleOpen(open)}>
+        <Dialog open={open} onOpenChange={(open: boolean) => handleOpen(open)}>
             <div onClick={preventDefault}>
-                <DialogTrigger className={'size-6'}>
-                    <SquarePen color={'white'} className={'size-6'} />
-                </DialogTrigger>
+                <SquarePen color={'white'} className={'size-6'} onClick={() => initialize()} />
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Update Playlist Metadata</DialogTitle>
-                        <DialogDescription className={'flex flex-col gap-4 p-4'}>
+                        <DialogDescription className={''}>
+                            Test string
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className={'flex flex-col gap-4 p-4'}>
+                        <div className={'grid grid-cols-4 items-center gap-4'}>
+                            <Label htmlFor={'title'}>Title:</Label>
+                            <Input className={'col-span-3'} id={'title'} placeholder={'né ' + title} value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} />
+                        </div>
+                        <div className={'grid grid-cols-4 items-center gap-4'}>
+                            <Label htmlFor={'description'}>Description:</Label>
+                            <Textarea className={'col-span-3'} id={'description'} placeholder={description} value={localDescription} onChange={(e) => setLocalDescription(e.target.value)} />
+                        </div>
+                        <div style={
+                            {
+                                backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(215.4, 16.3%, 46.9%) 1px, transparent 0)',
+                                backgroundSize: '8px 8px',
+                            }
+                        } onDragEnter={handleDragEnter}  id={'dropArea'}>
                             <div className={'grid grid-cols-4 items-center gap-4'}>
-                                <Label htmlFor={'title'}>Title:</Label>
-                                <Input className={'col-span-3'} id={'title'} placeholder={'né ' + title} value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} />
-                            </div>
-                            <div className={'grid grid-cols-4 items-center gap-4'}>
-                                <Label htmlFor={'description'}>Description:</Label>
-                                <Textarea className={'col-span-3'} id={'description'} placeholder={description} value={localDescription} onChange={(e) => setLocalDescription(e.target.value)} />
-                            </div>
-                            <div className={'grid grid-cols-4 items-center gap-4'}>
-                                <Label htmlFor={'coverImage'}>Cover Image:</Label>
-                                <Input className={'col-span-3'} id={'coverImage'} value={''} />
-                            </div>
-                            <div className={'h-[150px] overflow-scroll'}>
-                                <div className={'flex flex-wrap gap-4'}>
-                                    {posters.map((poster: poster) => {
-                                        return (
-                                            <div onClick={() => selectPoster(poster)} className={cn('hover:outline hover:-outline-offset-2 hover:outline-amber-300 relative', {
-                                                'outline -outline-offset-2 outline-amber-300': poster.selected,
-                                                'before:border-r-[40px] before:border-b-[40px] before:top-0 before:right-0 before:border-t-amber-300 before:border-r-amber-300 before:border-b-transparent before:border-l-transparent before:border-solid before:block before:absolute': poster.selected,
-                                                'after:text-[18px]/[25px] after:h-[25px] after:w-[25px] after:text-orange-900 after:content-["✓"] after:block after:absolute after:right-0 after:top-0 after:text-center': poster.selected
-                                            })}>
-                                                    <PlexImage key={poster.thumb} src={poster.thumb} alt={'poster'} style={{ height: '100px', width: 'auto' }}  height={100} width={150} />
-                                            </div>
-                                        )
-                                    })}
+                                <div style={
+                                    {
+                                        backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                                        backgroundSize: '1px 1px',
+                                    }
+                                } className={'row-span-5 h-full flex justify-start items-center -mr-2.5'}>
+                                    <Label className={'row-span-2'} htmlFor={'poster'}>Poster:</Label>
+                                </div>
+                                <div className={'col-span-3 row-span-5 h-full flex justify-center items-center'}>
+                                    {showPosterUrlInput ? (
+                                        <div className={'w-full mt-[8px] pr-[10px] grid grid-cols-4 items-center'}>
+                                            <Input style={
+                                                {
+                                                    backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                                                    backgroundSize: '1px 1px',
+                                                }
+                                            } className={'col-span-3'} placeholder={'Enter a url to upload an image'} value={externalPosterUrl} onChange={(e) => setExternalPosterUrl(e.target.value)} />
+                                            <Button style={
+                                                {
+                                                    backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)',
+                                                    backgroundSize: '1px 1px',
+                                                }
+                                            } className={'col-span-1'} onClick={() => uploadPosterByURL()}>&gt;</Button>
+                                            <span style={
+                                                {
+                                                    backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                                                    backgroundSize: '1px 1px',
+                                                }
+                                            } onClick={() => setShowPosterUrlInput(false)} className={'mt-[1px] col-span-3 text-xs cursor-pointer justify-self-end'}>Cancel</span>
+                                        </div>
+                                    ) : (
+                                        <div style={
+                                            {
+                                                backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                                                backgroundSize: '1px 1px',
+                                            }
+                                        } className={'px-2 pb-[2px]'}>
+                                            <Label className={'font-bold cursor-pointer'} htmlFor={'uploadPoster'} onClick={(e) => e.stopPropagation()}>Upload Image</Label>
+                                            <Input type={"file"} id={'uploadPoster'} onChange={uploadPosterByImages} className={'hidden'} onClick={(e) => e.stopPropagation()} multiple />
+                                            <span className={'font-bold cursor-default'} id={'separator'}> | </span>
+                                            <Label className={'font-bold hidden md:inline'}>Drag and Drop</Label>
+                                            <span className={'font-bold cursor-default hidden md:inline'} id={'separator'}> | </span>
+                                            <Label onClick={() => setShowPosterUrlInput(true)} className={'font-bold cursor-pointer'}>Enter Url</Label>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        </DialogDescription>
-                        <DialogFooter>
-                            <Button disabled={hasUpdates()} onClick={updatePlaylist}>Update Playlist</Button>
-                        </DialogFooter>
-                    </DialogHeader>
+                            {postersLoading ? (
+                                <Skeleton className={'h-[150px] mt-4 mb-2 w-full'} />
+                            ) : (
+                                <div className={'h-[150px] overflow-scroll mt-4 mb-2 pb-2'}>
+                                    <div className={'flex flex-wrap gap-4 p-2'}>
+                                        {posters.map((poster: poster) => {
+                                            return (
+                                                <div key={poster.key} onClick={() => selectPoster(poster)} className={cn('hover:outline hover:-outline-offset-2 hover:outline-amber-300 relative', {
+                                                    'outline -outline-offset-2 outline-amber-300': poster.selected,
+                                                    'before:border-r-[42px] before:border-b-[42px] before:top-0 before:right-0 before:border-t-amber-300 before:border-r-amber-300 before:border-b-transparent before:border-l-transparent before:border-solid before:block before:absolute': poster.selected,
+                                                    'after:h-[18px] after:w-[18px] after:content-[url(/checkmark.svg)] after:block after:absolute after:right-[4px] after:top-[2px]': poster.selected
+                                                })}>
+                                                    <PlexImage key={poster.thumb} src={poster.thumb} alt={'poster'} style={{ height: '100px', width: 'auto' }}  height={100} width={150} />
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylist}>Update Playlist</LoadingButton>
+                    </DialogFooter>
                 </DialogContent>
             </div>
         </Dialog>
