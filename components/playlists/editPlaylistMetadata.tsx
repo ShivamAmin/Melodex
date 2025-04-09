@@ -20,6 +20,7 @@ import poster from '@/types/poster';
 import { cn } from '@/lib/utils';
 import LoadingButton from "@/components/loadingButton";
 import { Skeleton } from "@/components/ui/skeleton";
+import { plexBaseURL } from '@/lib/consts';
 
 function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: string, title: string, description: string }) {
     const { plexAuthToken } = usePlexOAuth();
@@ -36,11 +37,12 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
 
     const preventDefault = (e: MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
     }
 
     const getPosters = async () => {
         setPostersLoading(true);
-        const url = `https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`;
+        const url = `${plexBaseURL}/library/metadata/${ratingKey}/posters`;
         if (plexAuthToken) {
             const req = await fetch(url, {
                 headers: {
@@ -52,8 +54,8 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             const selectedPosterKey = req.MediaContainer.Metadata.find((p: poster) => p.selected).key
             setOriginalSelectedPosterKey(selectedPosterKey);
             setSelectedPosterKey(selectedPosterKey);
-            setPostersLoading(false);
         }
+        setPostersLoading(false);
     }
 
     const selectPoster = (poster: poster) => {
@@ -71,7 +73,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
     }
 
     const uploadPosterByURL = async () => {
-        const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`);
+        const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/posters`);
         posterUrl.searchParams.append("url", externalPosterUrl);
         if (plexAuthToken) {
             await fetch(posterUrl, {
@@ -82,13 +84,12 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             });
             getPosters();
             setExternalPosterUrl('');
-            console.log('uploadPosterByURL()')
             setOpen(false);
         }
     }
 
     const uploadPosterByImages = async (e: ChangeEvent<HTMLInputElement>) => {
-        const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/posters`);
+        const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/posters`);
         if (e.target.files?.length && plexAuthToken) {
             const files = Array.from(e.target.files)
 
@@ -108,33 +109,13 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                 console.log(values);
                 getPosters();
             })
-
-            for (let i = 0; i < e.target.files?.length; i++) {
-                const fr = new FileReader();
-                fr.readAsArrayBuffer(e.target.files[i]);
-                fr.onload = async () => {
-                    if (fr.result) {
-                        await fetch(posterUrl, {
-                            method: "POST",
-                            headers: {
-                                'X-Plex-Token': plexAuthToken
-                            },
-                            body: fr.result
-                        }).then(() => getPosters())
-                    }
-                }
-                fr.onerror = () => {
-                    console.log(fr.error);
-                }
-                console.log();
-            }
         }
     }
 
     const updatePlaylist = async () => {
         setLoading(true);
         if (shouldTitleUpdate() || shouldDescriptionUpdate()) {
-            const metadataUrl = new URL(`https://plex.shivamamin.com/playlists/${ratingKey}`);
+            const metadataUrl = new URL(`${plexBaseURL}/playlists/${ratingKey}`);
             shouldTitleUpdate() && metadataUrl.searchParams.append("title", localTitle);
             shouldDescriptionUpdate() && metadataUrl.searchParams.append("summary", localDescription);
             if (plexAuthToken) {
@@ -148,7 +129,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             }
         }
         if (shouldPosterUpdate()) {
-            const posterUrl = new URL(`https://plex.shivamamin.com/library/metadata/${ratingKey}/poster`);
+            const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/poster`);
             posterUrl.searchParams.append("url", selectedPosterKey);
             if (plexAuthToken) {
                 await fetch(posterUrl.toString(), {
@@ -179,7 +160,6 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
             setTimeout(() => {
                 setLocalTitle('');
                 setLocalDescription('');
-                console.log('handleOpen()')
                 setOpen(false);
             }, 100);
         } else {
@@ -304,7 +284,9 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                         </div>
                     </div>
                     <DialogFooter>
-                        <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylist}>Update Playlist</LoadingButton>
+                        <div className={'md:w-[50px]'}>
+                            <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylist}>Update Playlist</LoadingButton>
+                        </div>
                     </DialogFooter>
                 </DialogContent>
             </div>

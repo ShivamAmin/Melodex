@@ -5,10 +5,11 @@ import Main from "@/components/page/main";
 import Header from "@/components/page/header";
 import Content from "@/components/page/content";
 import React from "react";
+import { plexBaseURL } from '@/lib/consts';
 
 async function Page({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const url = `https://plex.shivamamin.com/playlists/${slug}/items`;
+    const url = `${plexBaseURL}/playlists/${slug}/items`;
     const cookieStore = await cookies();
     const plexAuthToken = cookieStore.get('plex_auth_token');
 

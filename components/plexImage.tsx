@@ -4,7 +4,7 @@ import Image, { ImageProps } from "next/image";
 import { Skeleton } from '@/components/ui/skeleton';
 import usePlexOAuth from "@/hooks/usePlexOAuth";
 import { useState, useEffect } from "react";
-// import {cn} from "@/lib/utils";
+import { plexBaseURL } from '@/lib/consts';
 
 function PlexImage(props: ImageProps) {
     const { src, ...restProps } = props;
@@ -15,7 +15,7 @@ function PlexImage(props: ImageProps) {
 
     useEffect(() => {
         const controller = new AbortController();
-        const plexImageUrl = 'https://plex.shivamamin.com' + src;
+        const plexImageUrl = plexBaseURL + src;
 
         const getImage = async () => {
             if (plexAuthToken) {
