@@ -15,17 +15,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import PlexImage from "@/components/plexImage";
-import usePlexOAuth from "@/hooks/usePlexOAuth";
 import poster from '@/types/poster';
 import { cn } from '@/lib/utils';
 import LoadingButton from "@/components/loadingButton";
 import { Skeleton } from "@/components/ui/skeleton";
-import { plexBaseURL } from '@/lib/consts';
 import { updatePlaylist } from "@/actions/updatePlaylist";
 import { getPosters } from "@/actions/getPosters";
+import { uploadPosterByImages, uploadPosterByURL } from "@/actions/uploadPoster";
 
 function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: string, title: string, description: string }) {
-    const { plexAuthToken } = usePlexOAuth();
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [postersLoading, setPostersLoading] = useState(false);
@@ -68,42 +66,23 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         }
     }
 
-    const uploadPosterByURL = async () => {
-        const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/posters`);
-        posterUrl.searchParams.append("url", externalPosterUrl);
-        if (plexAuthToken) {
-            await fetch(posterUrl, {
-                method: "POST",
-                headers: {
-                    'X-Plex-Token': plexAuthToken
-                }
-            });
-            await getPostersHandler();
-            setExternalPosterUrl('');
-            setOpen(false);
-        }
+    const uploadPosterByURLHandler = async () => {
+
+        await uploadPosterByURL(ratingKey, externalPosterUrl);
+        await getPostersHandler();
+
+        setExternalPosterUrl('');
+        setTimeout(() => setOpen(false), 500)
     }
 
-    const uploadPosterByImages = async (e: ChangeEvent<HTMLInputElement>) => {
-        const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/posters`);
-        if (e.target.files?.length && plexAuthToken) {
-            const files = Array.from(e.target.files)
+    const uploadPosterByImagesHandler = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
 
-            await Promise.all(files.map(file => {
-                const fr = new FileReader();
-                fr.readAsArrayBuffer(file);
-                return fr.onload = () => {
-                    return fetch(posterUrl, {
-                        method: "POST",
-                        headers: {
-                            'X-Plex-Token': plexAuthToken
-                        },
-                        body: fr.result
-                    })
-                }
-            })).then(() => {
-                getPostersHandler();
-            })
+            await uploadPosterByImages(ratingKey, files);
+            await getPostersHandler();
+
+            setTimeout(() => setOpen(false), 500)
         }
     }
 
@@ -207,7 +186,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                                                     backgroundImage: 'radial-gradient(circle at 1px 1px, black 1px, transparent 0)',
                                                     backgroundSize: '1px 1px',
                                                 }
-                                            } className={'col-span-1'} onClick={() => uploadPosterByURL()}>&gt;</Button>
+                                            } className={'col-span-1'} onClick={() => uploadPosterByURLHandler()}>&gt;</Button>
                                             <span style={
                                                 {
                                                     backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
@@ -223,7 +202,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                                             }
                                         } className={'px-2 pb-[2px]'}>
                                             <Label className={'font-bold cursor-pointer'} htmlFor={'uploadPoster'} onClick={(e) => e.stopPropagation()}>Upload Image</Label>
-                                            <Input type={"file"} id={'uploadPoster'} onChange={uploadPosterByImages} className={'hidden'} onClick={(e) => e.stopPropagation()} multiple />
+                                            <Input type={"file"} id={'uploadPoster'} onChange={uploadPosterByImagesHandler} className={'hidden'} onClick={(e) => e.stopPropagation()} multiple />
                                             <span className={'font-bold cursor-default'} id={'separator'}> | </span>
                                             <Label className={'font-bold hidden md:inline'}>Drag and Drop</Label>
                                             <span className={'font-bold cursor-default hidden md:inline'} id={'separator'}> | </span>
