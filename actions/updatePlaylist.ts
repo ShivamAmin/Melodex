@@ -36,12 +36,14 @@ export const updatePlaylist = async (titleShouldUpdate: boolean, descriptionShou
         const metadataUrl = new URL(`${plexBaseURL}/playlists/${ratingKey}`);
         titleShouldUpdate && metadataUrl.searchParams.append("title", localTitle);
         descriptionShouldUpdate && metadataUrl.searchParams.append("summary", localDescription);
+
         await updateMetadata(metadataUrl)
     }
 
     if (posterShouldUpdate) {
         const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/poster`);
         posterUrl.searchParams.append("url", selectedPosterKey);
+
         await updatePoster(posterUrl);
     }
 

@@ -7,6 +7,7 @@ export const getPlaylistItems = async (playlistId: string): Promise<{ tracks: tr
     const playlistItemsUrl = new URL(`${plexBaseURL}/playlists/${playlistId}/items`);
     const cookieStore = await cookies();
     const plexAuthToken = cookieStore.get('plex_auth_token') as { value: string };
+
     const resp: {
         MediaContainer: {
             Metadata: track[],
