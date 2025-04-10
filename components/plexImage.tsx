@@ -14,8 +14,9 @@ function PlexImage(props: ImageProps) {
     const [imageSRCWithAuth, setImageSRCWithAuth] = useState<string>('');
 
     useEffect(() => {
+        setLoading(true);
         const controller = new AbortController();
-        const plexImageUrl = plexBaseURL + src;
+        const plexImageUrl = new URL(`${plexBaseURL}${src}`);
 
         const getImage = async () => {
             if (plexAuthToken) {
@@ -24,7 +25,8 @@ function PlexImage(props: ImageProps) {
                         method: 'GET',
                         headers: {
                             'X-Plex-Token': plexAuthToken
-                        }
+                        },
+                        signal: controller.signal,
                     })
                         .then(res => res.blob())
                         .then(blob => setImageSRCWithAuth(URL.createObjectURL(blob)))
@@ -37,13 +39,13 @@ function PlexImage(props: ImageProps) {
             }
         }
 
-        getImage();
+        setTimeout(() => getImage(), 500);
 
         return () => {
             controller.abort('Request cancelled unexpectedly');
         };
 
-    }, [plexAuthToken]);
+    }, [plexAuthToken, src]);
 
     if (loading) {
         if (restProps?.fill) {
