@@ -78,7 +78,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                     'X-Plex-Token': plexAuthToken
                 }
             });
-            getPostersHandler();
+            await getPostersHandler();
             setExternalPosterUrl('');
             setOpen(false);
         }
@@ -101,40 +101,15 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                         body: fr.result
                     })
                 }
-            })).then(values => {
+            })).then(() => {
                 getPostersHandler();
             })
         }
     }
 
-    const updatePlaylist = async () => {
+    const updatePlaylistHandler = async () => {
         setLoading(true);
-        if (shouldTitleUpdate() || shouldDescriptionUpdate()) {
-            const metadataUrl = new URL(`${plexBaseURL}/playlists/${ratingKey}`);
-            shouldTitleUpdate() && metadataUrl.searchParams.append("title", localTitle);
-            shouldDescriptionUpdate() && metadataUrl.searchParams.append("summary", localDescription);
-            if (plexAuthToken) {
-                setLoading(true);
-                await fetch(metadataUrl.toString(), {
-                    method: "PUT",
-                    headers: {
-                        'X-Plex-Token': plexAuthToken
-                    }
-                })
-            }
-        }
-        if (shouldPosterUpdate()) {
-            const posterUrl = new URL(`${plexBaseURL}/library/metadata/${ratingKey}/poster`);
-            posterUrl.searchParams.append("url", selectedPosterKey);
-            if (plexAuthToken) {
-                await fetch(posterUrl.toString(), {
-                    method: "PUT",
-                    headers: {
-                        'X-Plex-Token': plexAuthToken
-                    }
-                })
-            }
-        }
+        await updatePlaylist(shouldTitleUpdate(), shouldDescriptionUpdate(), shouldPosterUpdate(), ratingKey, localTitle, localDescription, selectedPosterKey);
         setTimeout(() => {
             setOpen(false);
             setTimeout(() => {
@@ -145,12 +120,12 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         }, 500)
     }
 
-    const initialize = () => {
+    const initialize = async () => {
         setOpen(true);
-        getPostersHandler();
+        await getPostersHandler();
     }
 
-    const handleOpen = (open: boolean) => {
+    const handleOpen = async (open: boolean) => {
         if (!open) {
             setTimeout(() => {
                 setLocalTitle('');
@@ -158,7 +133,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                 setOpen(false);
             }, 100);
         } else {
-            getPostersHandler();
+            await getPostersHandler();
         }
     }
 
@@ -279,8 +254,8 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                         </div>
                     </div>
                     <DialogFooter>
-                        <div className={'md:w-[50px]'}>
-                            <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylist}>Update Playlist</LoadingButton>
+                        <div className={'md:w-[150px]'}>
+                            <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylistHandler}>Update Playlist</LoadingButton>
                         </div>
                     </DialogFooter>
                 </DialogContent>
