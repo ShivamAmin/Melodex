@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import LoadingButton from "@/components/loadingButton";
 import { Skeleton } from "@/components/ui/skeleton";
 import { plexBaseURL } from '@/lib/consts';
+import { updatePlaylist } from "@/actions/updatePlaylist";
+import { getPosters } from "@/actions/getPosters";
 
 function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: string, title: string, description: string }) {
     const { plexAuthToken } = usePlexOAuth();
@@ -40,21 +42,13 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         e.stopPropagation();
     }
 
-    const getPosters = async () => {
+    const getPostersHandler = async () => {
         setPostersLoading(true);
-        const url = `${plexBaseURL}/library/metadata/${ratingKey}/posters`;
-        if (plexAuthToken) {
-            const req = await fetch(url, {
-                headers: {
-                    Accept: "application/json",
-                    'X-Plex-Token': plexAuthToken
-                }
-            }).then(resp => resp.json());
-            setPosters(req.MediaContainer.Metadata);
-            const selectedPosterKey = req.MediaContainer.Metadata.find((p: poster) => p.selected).key
-            setOriginalSelectedPosterKey(selectedPosterKey);
-            setSelectedPosterKey(selectedPosterKey);
-        }
+        const localPosters: poster[] = await getPosters(ratingKey);
+        setPosters(localPosters);
+        const selectedPosterKey = localPosters.find((p: poster) => p.selected)?.key as string;
+        setOriginalSelectedPosterKey(selectedPosterKey);
+        setSelectedPosterKey(selectedPosterKey);
         setPostersLoading(false);
     }
 
@@ -84,7 +78,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                     'X-Plex-Token': plexAuthToken
                 }
             });
-            getPosters();
+            getPostersHandler();
             setExternalPosterUrl('');
             setOpen(false);
         }
@@ -108,8 +102,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                     })
                 }
             })).then(values => {
-                console.log(values);
-                getPosters();
+                getPostersHandler();
             })
         }
     }
@@ -154,7 +147,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
 
     const initialize = () => {
         setOpen(true);
-        getPosters();
+        getPostersHandler();
     }
 
     const handleOpen = (open: boolean) => {
@@ -165,7 +158,7 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
                 setOpen(false);
             }, 100);
         } else {
-            getPosters();
+            getPostersHandler();
         }
     }
 
