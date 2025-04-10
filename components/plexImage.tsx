@@ -19,23 +19,21 @@ function PlexImage(props: ImageProps) {
         const plexImageUrl = new URL(`${plexBaseURL}${src}`);
 
         const getImage = async () => {
-            if (plexAuthToken) {
-                try {
-                    await fetch(plexImageUrl, {
-                        method: 'GET',
-                        headers: {
-                            'X-Plex-Token': plexAuthToken
-                        },
-                        signal: controller.signal,
-                    })
-                        .then(res => res.blob())
-                        .then(blob => setImageSRCWithAuth(URL.createObjectURL(blob)))
-                        .then(() => {
-                            setLoading(false);
-                        });
-                } catch (e) {
-                    setLoading(true);
-                }
+            try {
+                await fetch(plexImageUrl, {
+                    method: 'GET',
+                    headers: {
+                        'X-Plex-Token': plexAuthToken
+                    },
+                    signal: controller.signal,
+                })
+                    .then(res => res.blob())
+                    .then(blob => setImageSRCWithAuth(URL.createObjectURL(blob)))
+                    .then(() => {
+                        setLoading(false);
+                    });
+            } catch (e) {
+                setLoading(true);
             }
         }
 

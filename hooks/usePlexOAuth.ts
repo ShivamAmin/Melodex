@@ -40,7 +40,7 @@ const usePlexOAuth = () => {
         'X-Plex-Language': 'en',
     });
     const plexPin = useRef<PlexPin>({id: 0, code: ''});
-    const plexAuthToken = useRef<string | undefined>(Cookies.get('plex_auth_token'));
+    const plexAuthToken = useRef<string>(Cookies.get('plex_auth_token') as string);
     const loginPopup = useRef<Window | null>(null);
 
     const setHeaders = () => {
