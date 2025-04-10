@@ -62,14 +62,16 @@ function EditPlaylistMetadata({ ratingKey, title, description }: { ratingKey: st
         const tmp: poster[] = [...posters]
         const toBeSelectedIdx = posters.findIndex((p: poster) => p.key === poster.key);
         const toBeUnselectedIdx = posters.findIndex((p: poster) => p.selected);
-        const toBeSelected: poster = {...tmp[toBeSelectedIdx]}
-        const toBeUnselected: poster = {...tmp[toBeUnselectedIdx]}
-        toBeSelected.selected = true;
-        toBeUnselected.selected = false;
-        tmp[toBeSelectedIdx] = toBeSelected;
-        tmp[toBeUnselectedIdx] = toBeUnselected;
-        setSelectedPosterKey(toBeSelected.ratingKey);
-        setPosters(tmp);
+        if (toBeSelectedIdx !== toBeUnselectedIdx) {
+            const toBeSelected: poster = {...tmp[toBeSelectedIdx]}
+            const toBeUnselected: poster = {...tmp[toBeUnselectedIdx]}
+            toBeSelected.selected = true;
+            toBeUnselected.selected = false;
+            tmp[toBeSelectedIdx] = toBeSelected;
+            tmp[toBeUnselectedIdx] = toBeUnselected;
+            setSelectedPosterKey(toBeSelected.ratingKey);
+            setPosters(tmp);
+        }
     }
 
     const uploadPosterByURL = async () => {
