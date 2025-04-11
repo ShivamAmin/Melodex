@@ -37,7 +37,7 @@ function PlexImage(props: ImageProps) {
             }
         }
 
-        setTimeout(() => getImage(), 500);
+        setTimeout(() => getImage(), 250);
 
         return () => {
             controller.abort('Request cancelled unexpectedly');

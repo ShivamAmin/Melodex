@@ -1,8 +1,8 @@
 'use server'
 
-import {cookies, headers} from "next/headers";
+import { cookies, headers } from "next/headers";
 import { plexBaseURL } from "@/lib/consts";
-import {revalidatePath} from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export const uploadPosterByURL = async (ratingKey: string, externalPosterUrl: string) => {
     const header = await headers();
