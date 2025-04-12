@@ -15,12 +15,17 @@ export const createPlaylist = async (title: string) => {
     playlistUrl.searchParams.append('smart', '0');
     playlistUrl.searchParams.append('uri', '');
 
-    await fetch(playlistUrl.toString(), {
+    const ratingKey =  await fetch(playlistUrl.toString(), {
         method: 'POST',
         headers: {
+            Accept: 'application/json',
             'X-Plex-Token': plexAuthToken.value,
         },
     })
+        .then(res => res.json())
+        .then(data => data.MediaContainer.Metadata[0].ratingKey);
 
     revalidatePath(pathname)
+
+    return ratingKey;
 }

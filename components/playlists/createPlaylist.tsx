@@ -11,27 +11,37 @@ import {
 } from "@/components/ui/dialog";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
 import LoadingButton from "@/components/loadingButton";
 import { createPlaylist } from "@/actions/createPlaylist";
+import { EditPlaylistDialog } from "@/components/playlists/editPlaylistDialog";
 
 const CreatePlaylist = () => {
-    const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    const [editingPlaylist, setEditingPlaylist] = useState<boolean>(true);
+    const [open, setOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [title, setTitle] = useState<string>('');
+    const [ratingKey, setRatingKey] = useState<string>('');
 
     const handleOpen = (open: boolean) => {
         if (!open) {
-            setOpen(false);
+            resetModal();
         }
     }
 
     const createPlaylistHandler = async () => {
         setLoading(true);
-        await createPlaylist(title);
+        setRatingKey(await createPlaylist(title));
         setLoading(false);
+        setEditingPlaylist(false);
+    }
+
+    const resetModal = () => {
         setOpen(false);
+        setTimeout(() => {
+            setEditingPlaylist(true);
+            setLoading(false);
+            setTitle("");
+        }, 100);
     }
 
     return (
@@ -46,26 +56,26 @@ const CreatePlaylist = () => {
                     </div>
                 </CardContent>
             </Card>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Create New Playlist</DialogTitle>
-                </DialogHeader>
-                <div className={'flex flex-col gap-4 p-4'}>
-                    <div className={'grid grid-cols-4 items-center gap-4'}>
-                        <Label htmlFor={'title'}>Title:</Label>
-                        <Input className={'col-span-3'} id={'title'} placeholder={'Title'} value={title} onChange={(e) => setTitle(e.target.value)} />
+            {editingPlaylist ? (
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Create Playlist</DialogTitle>
+                    </DialogHeader>
+                    <div className={'flex flex-col gap-4 p-4'}>
+                        <div className={'grid grid-cols-4 items-center gap-4'}>
+                            <Label htmlFor={'title'}>Title:</Label>
+                            <Input className={'col-span-3'} id={'title'} placeholder={'Title'} value={title} onChange={(e) => setTitle(e.target.value)} />
+                        </div>
                     </div>
-                    <div className={'grid grid-cols-4 items-center gap-4'}>
-                        <Label htmlFor={'description'}>Description:</Label>
-                        <Textarea className={'col-span-3'} id={'description'} placeholder={'Description'} value={description} onChange={(e) => setDescription(e.target.value)} />
-                    </div>
-                </div>
-                <DialogFooter>
-                    <div className={'md:w-[150px]'}>
-                        <LoadingButton loading={loading} type={'button'} disabled={loading} onClick={createPlaylistHandler}>Create Playlist</LoadingButton>
-                    </div>
-                </DialogFooter>
-            </DialogContent>
+                    <DialogFooter>
+                        <div className={'md:w-[150px]'}>
+                            <LoadingButton loading={loading} type={'button'} disabled={loading} onClick={createPlaylistHandler}>Create Playlist</LoadingButton>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            ) : (
+                <EditPlaylistDialog ratingKey={ratingKey} title={title} setOpen={resetModal} />
+            ) }
         </Dialog>
     )
 }
