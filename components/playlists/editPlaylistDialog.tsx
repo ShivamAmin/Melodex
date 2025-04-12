@@ -1,7 +1,6 @@
 
-import { useState, useEffect, MouseEvent, ChangeEvent } from "react";
+import { useState, useEffect, DragEvent, ChangeEvent } from "react";
 import {
-    DialogContent,
     DialogHeader,
     DialogTitle,
     DialogDescription,
@@ -103,7 +102,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         return !shouldTitleUpdate() && !shouldDescriptionUpdate() && !shouldPosterUpdate();
     }
 
-    const handleDragEnter = (e: MouseEvent) => {
+    const handleDrop = (e: DragEvent) => {
         console.log(e.target)
     }
     const resetModal = () => {
@@ -122,28 +121,26 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
     }
 
     return (
-        <DialogContent>
+        <>
             <DialogHeader>
-                <DialogTitle>Update Playlist Metadata</DialogTitle>
-                <DialogDescription className={''}>
-                    Test string
-                </DialogDescription>
+                <DialogTitle>Edit Playlist</DialogTitle>
+                <DialogDescription>Playlist: {title}</DialogDescription>
             </DialogHeader>
             <div className={'flex flex-col gap-4 p-4'}>
                 <div className={'grid grid-cols-4 items-center gap-4'}>
                     <Label htmlFor={'title'}>Title:</Label>
-                    <Input className={'col-span-3'} id={'title'} placeholder={'né ' + title} value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} />
+                    <Input className={'col-span-3'} id={'title'} placeholder={'Enter new title'} value={localTitle} onChange={(e) => setLocalTitle(e.target.value)} />
                 </div>
                 <div className={'grid grid-cols-4 items-center gap-4'}>
                     <Label htmlFor={'description'}>Description:</Label>
-                    <Textarea className={'col-span-3'} id={'description'} placeholder={description} value={localDescription} onChange={(e) => setLocalDescription(e.target.value)} />
+                    <Textarea className={'col-span-3'} id={'description'} placeholder={'Enter new description'} value={localDescription} onChange={(e) => setLocalDescription(e.target.value)} />
                 </div>
                 <div style={
                     {
                         backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(215.4, 16.3%, 46.9%) 1px, transparent 0)',
                         backgroundSize: '8px 8px',
                     }
-                } onDragEnter={handleDragEnter}  id={'dropArea'}>
+                } onDrop={handleDrop}  id={'dropArea'}>
                     <div className={'grid grid-cols-4 items-center gap-4'}>
                         <div style={
                             {
@@ -218,6 +215,6 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                     <LoadingButton loading={loading} type={'button'} disabled={shouldButtonBeDisabled() || loading} onClick={updatePlaylistHandler}>Update Playlist</LoadingButton>
                 </div>
             </DialogFooter>
-        </DialogContent>
+        </>
     );
 }

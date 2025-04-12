@@ -5,6 +5,7 @@ import {Card, CardContent, CardTitle} from "@/components/ui/card";
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle
@@ -56,26 +57,29 @@ const CreatePlaylist = () => {
                     </div>
                 </CardContent>
             </Card>
-            {editingPlaylist ? (
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Create Playlist</DialogTitle>
-                    </DialogHeader>
-                    <div className={'flex flex-col gap-4 p-4'}>
-                        <div className={'grid grid-cols-4 items-center gap-4'}>
-                            <Label htmlFor={'title'}>Title:</Label>
-                            <Input className={'col-span-3'} id={'title'} placeholder={'Title'} value={title} onChange={(e) => setTitle(e.target.value)} />
+            <DialogContent>
+                {editingPlaylist ? (
+                    <>
+                        <DialogHeader>
+                            <DialogTitle>Create Playlist</DialogTitle>
+                        </DialogHeader>
+                        <DialogDescription />
+                        <div className={'flex flex-col gap-4 p-4'}>
+                            <div className={'grid grid-cols-4 items-center gap-4'}>
+                                <Label htmlFor={'title'}>Title:</Label>
+                                <Input className={'col-span-3'} id={'title'} placeholder={'Title'} value={title} onChange={(e) => setTitle(e.target.value)} />
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter>
-                        <div className={'md:w-[150px]'}>
-                            <LoadingButton loading={loading} type={'button'} disabled={loading} onClick={createPlaylistHandler}>Create Playlist</LoadingButton>
-                        </div>
-                    </DialogFooter>
-                </DialogContent>
-            ) : (
-                <EditPlaylistDialog ratingKey={ratingKey} title={title} setOpen={resetModal} />
-            ) }
+                        <DialogFooter>
+                            <div className={'md:w-[150px]'}>
+                                <LoadingButton loading={loading} type={'button'} disabled={loading} onClick={createPlaylistHandler}>Create Playlist</LoadingButton>
+                            </div>
+                        </DialogFooter>
+                    </>
+                ) : (
+                    <EditPlaylistDialog ratingKey={ratingKey} title={title} setOpen={resetModal} />
+                ) }
+            </DialogContent>
         </Dialog>
     )
 }

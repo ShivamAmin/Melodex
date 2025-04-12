@@ -2,7 +2,7 @@
 
 import { useState, MouseEvent } from "react";
 import { SquarePen } from "lucide-react";
-import { Dialog } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { EditPlaylistDialog } from "@/components/playlists/editPlaylistDialog";
 
@@ -28,7 +28,9 @@ export const EditPlaylist = ({ ratingKey, title, description }: { ratingKey: str
         <Dialog open={open} onOpenChange={(open: boolean) => handleOpen(open)}>
             <div onClick={preventDefault}>
                 <SquarePen color={'white'} className={'size-6'} onClick={() => initialize()} />
-                <EditPlaylistDialog ratingKey={ratingKey} title={title} description={description} setOpen={(b) => setOpen(b)} />
+                <DialogContent>
+                    <EditPlaylistDialog ratingKey={ratingKey} title={title} description={description} setOpen={(b) => setOpen(b)} />
+                </DialogContent>
             </div>
         </Dialog>
     )
