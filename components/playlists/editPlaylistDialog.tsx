@@ -66,7 +66,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         await getPostersHandler();
 
         setExternalPosterUrl('');
-        setTimeout(() => resetModal(), 500)
+        getPostersHandler();
     }
 
     const uploadPosterByImagesHandler = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +75,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
 
             await uploadPosterByImages(ratingKey, files);
 
-            setTimeout(() => resetModal(), 500)
+            getPostersHandler();
         }
     }
 
@@ -102,8 +102,20 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         return !shouldTitleUpdate() && !shouldDescriptionUpdate() && !shouldPosterUpdate();
     }
 
-    const handleDrop = (e: DragEvent) => {
-        console.log(e.target)
+    const preventDefault = (e: DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    const handleDrop = async (e: DragEvent) => {
+        preventDefault(e);
+        if (e.dataTransfer.files) {
+            const files = Array.from(e.dataTransfer.files);
+
+            await uploadPosterByImages(ratingKey, files);
+
+            getPostersHandler();
+        }
     }
     const resetModal = () => {
         setOpen(false);
@@ -140,7 +152,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                         backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(215.4, 16.3%, 46.9%) 1px, transparent 0)',
                         backgroundSize: '8px 8px',
                     }
-                } onDrop={handleDrop}  id={'dropArea'}>
+                } onDrop={handleDrop} onDragOver={preventDefault}  id={'dropArea'}>
                     <div className={'grid grid-cols-4 items-center gap-4'}>
                         <div style={
                             {
