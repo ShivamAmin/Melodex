@@ -54,7 +54,7 @@ function PlexImage(props: ImageProps) {
     }
 
     return (
-        <Image src={imageSRCWithAuth} {...restProps} />
+        <Image src={imageSRCWithAuth} {...restProps} onError={() => setImageSRCWithAuth('/logo.svg')} />
 )
 }
 
