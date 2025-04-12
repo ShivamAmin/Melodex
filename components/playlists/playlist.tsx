@@ -5,7 +5,7 @@ import {
     CardDescription,
 } from '@/components/ui/card';
 import PlexImage from "@/components/plexImage";
-import EditPlaylistMetadata from "@/components/playlists/editPlaylistMetadata";
+import EditPlaylist from "@/components/playlists/editPlaylist";
 import playlist from '@/types/playlist'
 import Link from "next/link";
 import DeletePlaylist from "@/components/playlists/deletePlaylist";
@@ -19,7 +19,7 @@ function Playlist({ playlist }: { playlist: playlist }) {
                     <div className={'absolute inset-0 flex flex-col items-center justify-end gap-2 p-2 bg-black bg-opacity-25 hover:bg-opacity-50'}>
                             <div className={'absolute inset-0 flex justify-end p-2'}>
                                 <div className={'flex flex-col gap-4'}>
-                                    <EditPlaylistMetadata ratingKey={playlist.ratingKey} title={playlist.title} description={playlist.summary} />
+                                    <EditPlaylist ratingKey={playlist.ratingKey} title={playlist.title} description={playlist.summary} />
                                     <DeletePlaylist playlist={playlist} />
                                 </div>
                             </div>
