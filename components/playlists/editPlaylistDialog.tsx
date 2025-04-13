@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { updatePlaylist } from "@/actions/updatePlaylist";
 import { getPosters } from "@/actions/getPosters";
 import { uploadPosterByImages, uploadPosterByURL } from "@/actions/uploadPoster";
+import { toast } from "sonner";
 
 export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: { ratingKey: string, title: string, description?: string, setOpen: (b: boolean) => void }) => {
     const [loading, setLoading] = useState(false);
@@ -69,11 +70,32 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         getPostersHandler();
     }
 
-    const uploadPosterByImagesHandler = async (e: ChangeEvent<HTMLInputElement>) => {
+    const checkFiles = (files: File[]) => {
+        const invalidFiles: string[] = [];
+        const approvedFiles: File[] = [];
+
+        files.map((file) => {
+            if (!file.type.includes("image")) {
+                invalidFiles.push(file.name);
+            } else {
+                approvedFiles.push(file);
+            }
+        });
+
+        invalidFiles.forEach((file) => {
+            toast.error('Uh oh!', {
+                description: file + ' could not be uploaded'
+            });
+        })
+
+        return approvedFiles;
+    }
+
+    const uploadPosterWithFilePicker = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const files = Array.from(e.target.files);
 
-            await uploadPosterByImages(ratingKey, files);
+            await uploadPosterByImages(ratingKey, checkFiles(files));
 
             getPostersHandler();
         }
@@ -102,9 +124,10 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         return !shouldTitleUpdate() && !shouldDescriptionUpdate() && !shouldPosterUpdate();
     }
 
-    const preventDefault = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const preventDefault = (e: unknown) => {
+        const event = e as Event;
+        event.preventDefault();
+        event.stopPropagation();
     }
 
     const handleDrop = async (e: DragEvent) => {
@@ -112,7 +135,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         if (e.dataTransfer.files) {
             const files = Array.from(e.dataTransfer.files);
 
-            await uploadPosterByImages(ratingKey, files);
+            await uploadPosterByImages(ratingKey, checkFiles(files));
 
             getPostersHandler();
         }
@@ -164,7 +187,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                         </div>
                         <div className={'col-span-3 row-span-5 h-full flex justify-center items-center'}>
                             {showPosterUrlInput ? (
-                                <div className={'w-full mt-[8px] pr-[10px] grid grid-cols-4 items-center'}>
+                                <div className={'w-full mt-[8px] px-[10px] grid grid-cols-4 items-center'}>
                                     <Input style={
                                         {
                                             backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
@@ -192,7 +215,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                                     }
                                 } className={'px-2 pb-[2px]'}>
                                     <Label className={'font-bold cursor-pointer'} htmlFor={'uploadPoster'} onClick={(e) => e.stopPropagation()}>Upload Image</Label>
-                                    <Input type={"file"} id={'uploadPoster'} onChange={uploadPosterByImagesHandler} className={'hidden'} onClick={(e) => e.stopPropagation()} multiple />
+                                    <Input type={"file"} id={'uploadPoster'} onChange={uploadPosterWithFilePicker} className={'hidden'} onClick={(e) => e.stopPropagation()} multiple />
                                     <span className={'font-bold cursor-default'} id={'separator'}> | </span>
                                     <Label className={'font-bold hidden md:inline'}>Drag and Drop</Label>
                                     <span className={'font-bold cursor-default hidden md:inline'} id={'separator'}> | </span>
