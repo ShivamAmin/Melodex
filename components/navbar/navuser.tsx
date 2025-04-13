@@ -106,7 +106,7 @@ export const NavUser = ({ user }: {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <Link href={'/user/settings'}>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem className={'cursor-pointer'}  >
                                     <BadgeCheck />
                                     Account
                                 </DropdownMenuItem>
@@ -121,7 +121,7 @@ export const NavUser = ({ user }: {
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={signOut}>
+                        <DropdownMenuItem className={'cursor-pointer'} onClick={signOut}>
                             <LogOut />
                             Log out
                         </DropdownMenuItem>

@@ -9,19 +9,26 @@ export default async function authMiddleware(request: NextRequest) {
     const isAuthRoute = authRoutes.includes(pathName);
     const isPasswordRoute = passwordRoutes.includes(pathName);
     const sessionCookie = getSessionCookie(request);
+    const next = NextResponse.next();
+    const redirectHome = NextResponse.redirect(new URL('/', request.url));
+    const redirectSignIn = NextResponse.redirect(new URL('/sign-in', request.url));
+
+    next.headers.set('x-pathname', request.nextUrl.pathname);
+    redirectHome.headers.set('x-pathname', request.nextUrl.pathname);
+    redirectSignIn.headers.set('x-pathname', request.nextUrl.pathname);
 
     if (!sessionCookie) {
         if (isAuthRoute || isPasswordRoute) {
-            return NextResponse.next();
+            return next;
         }
-        return NextResponse.redirect(new URL(`/sign-in`, request.url));
+        return redirectSignIn;
     }
 
     if (isAuthRoute || isPasswordRoute) {
-        return NextResponse.redirect(new URL('/', request.url));
+        return redirectHome;
     }
 
-    return NextResponse.next();
+    return next;
 }
 export const config = {
     matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
