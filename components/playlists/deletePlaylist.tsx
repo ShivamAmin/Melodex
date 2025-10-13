@@ -81,7 +81,7 @@ function DeletePlaylist({playlist }: { playlist: playlist }) {
                             </CardContent>
                         </Card>
                         <div>
-                            <Label htmlFor={'confirmation'}>Type '{playlist.title}' to confirm</Label>
+                            <Label htmlFor={'confirmation'}>Type &lsquo;{playlist.title}&lsquo; to confirm</Label>
                             <Input id={'confirmation'} placeholder={'Retype playlist title to confirm'} onChange={(e) => setConfirmation(e.target.value)} />
                         </div>
                     </div>
