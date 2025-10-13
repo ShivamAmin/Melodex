@@ -49,4 +49,4 @@ Set migration as applied
 `npx prisma migrate resolve --applied 0_init`
  
 Apply changes to db
-`prisma migrate dev`
+`npx prisma migrate dev`

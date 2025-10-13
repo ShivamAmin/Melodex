@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "genver": "npx genversion utils/version.js",
-    "dev": "npm run genver && next dev --turbopack",
-    "build": "npm run genver && next build",
+    "db:client": "npx prisma generate",
+    "dev": "npm run genver && npm run db:client && next dev --turbopack",
+    "build": "npm run genver && npm run db:client && next build",
+    "db:dev": "npx prisma migrate dev",
+    "db:prod": "npx prisma migrate deploy",
     "start": "next start",
     "lint": "next lint"
   },
-  "packageManager": "npm@10.9.2",
+  "packageManager": "npm@10.9.3",
   "overrides": {
     "react": "$react",
     "react-dom": "$react-dom"
@@ -56,6 +59,7 @@
     "eslint-config-next": "15.1.6",
     "genversion": "^3.2.0",
     "postcss": "^8",
+    "prisma": "^6.16.3",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }
