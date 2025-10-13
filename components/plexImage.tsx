@@ -32,7 +32,8 @@ function PlexImage(props: ImageProps) {
                     .then(() => {
                         setLoading(false);
                     });
-            } catch (e) {
+            } catch (error) {
+                console.log('Error fetching image:', error);
                 setLoading(true);
             }
         }
@@ -54,7 +55,7 @@ function PlexImage(props: ImageProps) {
     }
 
     return (
-        <Image src={imageSRCWithAuth} {...restProps} onError={() => setImageSRCWithAuth('/logo.svg')} />
+        <Image src={imageSRCWithAuth} {...restProps} alt={restProps?.alt || 'a plex image'} onError={() => setImageSRCWithAuth('/logo.svg')} />
 )
 }
 

@@ -31,10 +31,6 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
     const [showPosterUrlInput, setShowPosterUrlInput] = useState<boolean>(false);
     const [externalPosterUrl, setExternalPosterUrl] = useState<string>('');
 
-    useEffect(() => {
-        getPostersHandler();
-    }, [ratingKey])
-
     const getPostersHandler = async () => {
         setPostersLoading(true);
         const localPosters: poster[] = await getPosters(ratingKey);
@@ -154,6 +150,11 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
             setExternalPosterUrl('');
         }, 100);
     }
+
+
+    useEffect(() => {
+        getPostersHandler();
+    });
 
     return (
         <>

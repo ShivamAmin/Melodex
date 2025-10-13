@@ -55,11 +55,11 @@ const usePlexOAuth = () => {
             ...plexHeaders.current,
             'X-Plex-Client-Identifier': clientId,
             'X-Plex-Version': version,
-            'X-Plex-Platform': browser.getBrowserName(),
-            'X-Plex-Platform-Version': browser.getBrowserVersion(),
-            'X-Plex-Device': browser.getOSName(),
-            'X-Plex-Model': browser.getUA(),
-            'X-Plex-Device-Vendor': browser.getOSName(),
+            'X-Plex-Platform': browser.getBrowserName() || '',
+            'X-Plex-Platform-Version': browser.getBrowserVersion() || '',
+            'X-Plex-Device': browser.getOSName() || '',
+            'X-Plex-Model': browser.getUA() || '',
+            'X-Plex-Device-Vendor': browser.getOSName() || '',
             'X-Plex-Device-Name': `${browser.getOSName()} Melodex`,
             'X-Plex-Device-Screen-Resolution': window.screen.width + 'x' + window.screen.height
         }
