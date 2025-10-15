@@ -52,9 +52,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./extrypoint.sh
+COPY --from=builder --chown=nextjs:nodejs /app/entrypoint.sh ./entrypoint.sh
 
-RUN chmod +x ./extrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
@@ -70,4 +70,4 @@ ENV PORT=3000
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
-CMD ["sh", "./extrypoint.sh"]
+CMD ["sh", "./entrypoint.sh"]
