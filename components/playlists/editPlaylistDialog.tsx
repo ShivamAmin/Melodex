@@ -1,5 +1,4 @@
-
-import { useState, useEffect, DragEvent, ChangeEvent } from "react";
+import { useState, useEffect, DragEvent, ChangeEvent, useCallback } from "react";
 import {
     DialogHeader,
     DialogTitle,
@@ -31,7 +30,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
     const [showPosterUrlInput, setShowPosterUrlInput] = useState<boolean>(false);
     const [externalPosterUrl, setExternalPosterUrl] = useState<string>('');
 
-    const getPostersHandler = async () => {
+    const getPostersHandler = useCallback(async () => {
         setPostersLoading(true);
         const localPosters: poster[] = await getPosters(ratingKey);
         setPosters(localPosters);
@@ -39,7 +38,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         setOriginalSelectedPosterKey(selectedPosterKey);
         setSelectedPosterKey(selectedPosterKey);
         setPostersLoading(false);
-    }
+    }, [ratingKey])
 
     const selectPoster = (poster: poster) => {
         const tmp: poster[] = [...posters]
@@ -136,6 +135,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
             getPostersHandler();
         }
     }
+    
     const resetModal = () => {
         setOpen(false);
         setTimeout(() => {
@@ -151,10 +151,10 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
         }, 100);
     }
 
-
     useEffect(() => {
+        console.log('Modal Mounted');
         getPostersHandler();
-    });
+    }, [getPostersHandler]);
 
     return (
         <>
