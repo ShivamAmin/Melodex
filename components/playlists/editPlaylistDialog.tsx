@@ -135,7 +135,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
             getPostersHandler();
         }
     }
-    
+
     const resetModal = () => {
         setOpen(false);
         setTimeout(() => {
@@ -152,7 +152,6 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
     }
 
     useEffect(() => {
-        console.log('Modal Mounted');
         getPostersHandler();
     }, [getPostersHandler]);
 
