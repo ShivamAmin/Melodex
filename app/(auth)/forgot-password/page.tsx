@@ -25,7 +25,7 @@ const Page = () => {
     });
 
     const handleForgotPassword = async (data: z.infer<typeof forgotPasswordSchema>) => {
-        await authClient.forgetPassword({
+        await authClient.requestPasswordReset({
             email: data.email,
             redirectTo: '/reset-password',
         }, {
