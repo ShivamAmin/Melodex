@@ -205,7 +205,7 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                                             backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
                                             backgroundSize: '1px 1px',
                                         }
-                                    } onClick={() => setShowPosterUrlInput(false)} className={'mt-[1px] col-span-3 text-xs cursor-pointer justify-self-end'}>Cancel</span>
+                                    } onClick={() => setShowPosterUrlInput(false)} className={'mt-px col-span-3 text-xs cursor-pointer justify-self-end'}>Cancel</span>
                                 </div>
                             ) : (
                                 <div style={
@@ -231,9 +231,9 @@ export const EditPlaylistDialog = ({ ratingKey, title, description, setOpen }: {
                             <div className={'flex flex-wrap gap-4 p-2'}>
                                 {posters.map((poster: poster) => {
                                     return (
-                                        <div key={poster.key} onClick={() => selectPoster(poster)} className={cn('hover:outline hover:-outline-offset-2 hover:outline-amber-300 relative', {
-                                            'outline -outline-offset-2 outline-amber-300': poster.selected,
-                                            'before:border-r-[42px] before:border-b-[42px] before:top-0 before:right-0 before:border-t-amber-300 before:border-r-amber-300 before:border-b-transparent before:border-l-transparent before:border-solid before:block before:absolute': poster.selected,
+                                        <div key={poster.key} onClick={() => selectPoster(poster)} className={cn('hover:outline-solid hover:-outline-offset-2 hover:outline-amber-300 relative', {
+                                            'outline-solid -outline-offset-2 outline-amber-300': poster.selected,
+                                            'before:border-r-42 before:border-b-42 before:top-0 before:right-0 before:border-t-amber-300 before:border-r-amber-300 before:border-b-transparent before:border-l-transparent before:border-solid before:block before:absolute': poster.selected,
                                             'after:h-[18px] after:w-[18px] after:content-[url(/checkmark.svg)] after:block after:absolute after:right-[4px] after:top-[2px]': poster.selected
                                         })}>
                                             <PlexImage key={poster.thumb} src={poster.thumb} alt={'poster'} style={{ height: '100px', width: 'auto' }}  height={100} width={150} />
