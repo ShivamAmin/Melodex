@@ -50,8 +50,8 @@ const CreatePlaylist = () => {
             <Card onClick={() => setOpen(true)} className={`w-[280px] overflow-hidden [content-visibility:auto] cursor-pointer`}>
                 <CardContent className={'relative w-full aspect-square'}>
                     <img src={'/logo.svg'} alt={'Create Playlist'} className={'absolute w-full h-full inset-0'} />
-                    <div className={'absolute inset-0 flex flex-col items-center justify-end gap-2 p-2 bg-black bg-opacity-25 hover:bg-opacity-50'}>
-                        <CardTitle className={'text-white [text-shadow:_black_0px_0px_10px]'}>
+                    <div className={'absolute inset-0 flex flex-col items-center justify-end gap-2 p-2 bg-black/25 hover:bg-black/50'}>
+                        <CardTitle className={'text-white [text-shadow:black_0px_0px_10px]'}>
                             Create New Playlist
                         </CardTitle>
                     </div>
