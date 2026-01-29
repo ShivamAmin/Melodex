@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Main from '@/components/page/main';
 import Header from '@/components/page/header';
 import Content from "@/components/page/content";
@@ -8,6 +8,7 @@ import LoadingButton from "@/components/loadingButton";
 import usePlexOAuth from "@/hooks/usePlexOAuth";
 import { toast } from "sonner";
 import parseErrorMessage from "@/utils/parseErrorMessage";
+import SpotifyAuthButton from '@/components/spotifyAuthButton';
 
 function Page() {
     const [loading, setLoading] = useState(false);
@@ -30,6 +31,7 @@ function Page() {
             <Header>Settings Page</Header>
             <Content>
                 <LoadingButton onClick={() => getPlexToken()} loading={loading} type={'button'} disabled={!!plexAuthToken}>Plex</LoadingButton>
+                <SpotifyAuthButton />
             </Content>
         </Main>
     )
