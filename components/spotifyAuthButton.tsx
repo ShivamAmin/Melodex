@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import Spinner from '@/components/spinner';
-import { auth } from "@/actions/spotify/auth";
 import useSpotifyOAuth from "@/hooks/useSpotifyOAuth";
+import { toast } from "sonner";
+import parseErrorMessage from "@/utils/parseErrorMessage";
+import { Button } from "@/components/ui/button";
+import { Spinner } from '@/components/ui/spinner';
 
 const SpotifyAuthButton = () => {
     const [isLoadingState, setIsLoadingState] = useState(false);
@@ -12,8 +13,14 @@ const SpotifyAuthButton = () => {
     const clickHandler = async () => {
         setIsLoadingState(true);
         await initializeLogin();
-        setTimeout(() => {
-            login();
+        setTimeout(async () => {
+            try {
+                await login();
+            } catch (error) {
+                toast.error('Spotify Auth', { description: parseErrorMessage(error) });
+            } finally {
+                setIsLoadingState(false);
+            }
         }, 2000);
     }
     return (
