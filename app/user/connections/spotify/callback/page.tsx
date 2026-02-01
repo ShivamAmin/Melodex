@@ -18,7 +18,12 @@ function page() {
         Cookies.set('spotify_auth_code', code!);
     }
     
-    return <div className="flex w-full h-full items-center justify-center"><Spinner className='size-16'/></div>
+    return (
+        <div className="flex w-full h-full items-center justify-center">
+            <Spinner className='size-16'/>
+        </div>
+
+    )
 }
 
 export default page;

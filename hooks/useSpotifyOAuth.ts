@@ -1,13 +1,12 @@
 import { useRef } from "react";
 import Cookies from 'js-cookie';
 import { spotifyClientID, spotifyRedirectURI } from "@/lib/consts";
-
-//Save spotify refresh token in cookies
-//Close popup after refresh token is saved
+import { getAccessToken, refreshAccessToken } from "@/actions/spotify/auth";
 
 const useSpotifyOAuth = () => {
     const loginPopup = useRef<Window | null>(null);
-    const spotifyAuthToken = useRef<string>(Cookies.get('spotify_auth_token') as string);
+    const spotifyAccessToken = useRef<string>(Cookies.get('spotify_access_token') as string);
+    const spotifyRefreshToken = useRef<string>(Cookies.get('spotify_refresh_token') as string);
     const state = useRef<string>(Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10));
     const scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
     const authURL = useRef<URL>(new URL('https://accounts.spotify.com/authorize?'));
@@ -51,15 +50,8 @@ const useSpotifyOAuth = () => {
         loginPopup.current = null;
     };
 
-    const initializeLogin = () => {
-        openLoginPopup('Spotify Auth', 700, 600);
-    };
-
-    // Check for auth error
-    // Check for auth code and exchange for refresh token
-    // If neither, keep polling unless popup is closed
     const pollSpotifyAuth = (): Promise<string> => {
-        const executePoll = async (resolve: (spotifyAuthToken: string) => void, reject: (e: Error) => void) => {
+        const executePoll = async (resolve: (spotifyAccessToken: string) => void, reject: (e: Error) => void) => {
             const authCode = Cookies.get('spotify_auth_code');
             const authError = Cookies.get('spotify_auth_error');
             if (authError) {
@@ -69,7 +61,17 @@ const useSpotifyOAuth = () => {
                 return;
             } else if (authCode) {
                 Cookies.remove('spotify_auth_code');
-                //Exchange auth code for auth token
+                try {
+                    const [accessToken, refreshToken] = await getAccessToken(authCode);
+                    Cookies.set('spotify_access_token', accessToken);
+                    Cookies.set('spotify_refresh_token', refreshToken);
+                    spotifyAccessToken.current = accessToken;
+                    spotifyRefreshToken.current = refreshToken;
+                    closeLoginPopup();
+                    resolve(accessToken);
+                } catch (error) {
+                    reject(error as Error);
+                }
             } else if (!loginPopup.current?.closed) {
                 setTimeout(() => executePoll(resolve, reject), 1000);
             } else {
@@ -84,14 +86,32 @@ const useSpotifyOAuth = () => {
     }
 
     const login = async (): Promise<string> => {
-        if (loginPopup.current) {
-            loginPopup.current.location.href = authURL.current.toString();
-        }
+        openLoginPopup('Spotify Auth', 700, 600);
 
+        setTimeout(async () => {
+            if (loginPopup.current) {
+                loginPopup.current.location.href = authURL.current.toString();
+            }
+        }, 2000);
+        
         return pollSpotifyAuth();
     }
 
-    return { initializeLogin, login, spotifyAuthToken: spotifyAuthToken.current };
+    const refreshToken = async () => {
+        try {
+            if (!spotifyRefreshToken.current) {
+                throw new Error('No refresh token available. Re-authentication required.');
+            }
+            const accessToken = await refreshAccessToken(spotifyRefreshToken.current);
+            Cookies.set('spotify_access_token', accessToken);
+            spotifyAccessToken.current = accessToken;
+        } catch (error) {
+            throw error;
+        }
+        
+    }
+
+    return { login, refreshToken, spotifyAccessToken: spotifyAccessToken.current };
 }
 
 export default useSpotifyOAuth;

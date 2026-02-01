@@ -1,13 +1,39 @@
 'use server';
 
-export const auth = async () => {
-    const state = Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10);
-    const scope = 'playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
-    const authURL = new URL('https://accounts.spotify.com/authorize?');
-    authURL.searchParams.append('response_type', 'code');
-    authURL.searchParams.append('client_id', process.env.SPOTIFY_CLIENT_ID!);
-    authURL.searchParams.append('scope', scope);
-    authURL.searchParams.append('redirect_uri', process.env.BETTER_AUTH_URL! + '/api/spotify/callback');
-    authURL.searchParams.append('state', state);
-    await fetch(authURL.toString());
+import { spotifyClientID, spotifyClientSecret, spotifyRedirectURI } from "@/lib/consts";
+
+
+export const getAccessToken = async (authCode: string) => {
+    const tokenURL = new URL('https://accounts.spotify.com/api/token?');
+
+    tokenURL.searchParams.append('grant_type', 'authorization_code');
+    tokenURL.searchParams.append('redirect_uri', spotifyRedirectURI);
+    tokenURL.searchParams.append('code', authCode);
+
+    const resp = await fetch(tokenURL.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + Buffer.from(spotifyClientID + ':' + spotifyClientSecret).toString('base64'),
+        },
+    }).then(res => res.json());
+    return [resp.access_token, resp.refresh_token];
+}
+
+export const refreshAccessToken = async (refreshToken: string) => {
+    const tokenURL = new URL('https://accounts.spotify.com/api/token?');
+
+    tokenURL.searchParams.append('grant_type', 'refresh_token');
+    tokenURL.searchParams.append('refresh_token', refreshToken);
+    tokenURL.searchParams.append('client_id', spotifyClientID);
+
+    const resp = await fetch(tokenURL.toString(), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + Buffer.from(spotifyClientID + ':' + spotifyClientSecret).toString('base64'),
+        },
+    }).then(res => res.json());
+
+    return resp.access_token;
 }

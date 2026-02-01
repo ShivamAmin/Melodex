@@ -9,26 +9,28 @@ import { Spinner } from '@/components/ui/spinner';
 
 const SpotifyAuthButton = () => {
     const [isLoadingState, setIsLoadingState] = useState(false);
-    const { initializeLogin, login } = useSpotifyOAuth();
+    const { login, refreshToken, spotifyAccessToken } = useSpotifyOAuth();
     const clickHandler = async () => {
         setIsLoadingState(true);
-        await initializeLogin();
-        setTimeout(async () => {
-            try {
+        try {
+            if (!spotifyAccessToken) {
+                console.log(!spotifyAccessToken)
                 await login();
-            } catch (error) {
-                toast.error('Spotify Auth', { description: parseErrorMessage(error) });
-            } finally {
-                setIsLoadingState(false);
+            } else {
+                await refreshToken();
             }
-        }, 2000);
+        } catch (error) {
+            toast.error('Spotify Auth', { description: parseErrorMessage(error) });
+        } finally {
+            setIsLoadingState(false);
+        }
     }
     return (
         <Button onClick={clickHandler} className="w-full bg-green-600 hover:bg-green-700" disabled={isLoadingState}>
             {isLoadingState ? (
                 <Spinner color={'white'} />
             ) : (
-                'Connect to Spotify'
+                <>{!!spotifyAccessToken ? 'Rea' : 'A'}uthenticate Spotify Account</>
             )}
         </Button>
     )
