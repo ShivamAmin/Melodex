@@ -3,26 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import Bowser from 'bowser';
 import version from '@/utils/version';
 import Cookies from 'js-cookie';
-
-interface PlexHeaders extends Record<string, string> {
-    Accept: string;
-    'X-Plex-Client-Identifier': string;
-    'X-Plex-Product': string;
-    'X-Plex-Version': string;
-    'X-Plex-Platform': string;
-    'X-Plex-Platform-Version': string;
-    'X-Plex-Device': string;
-    'X-Plex-Model': string;
-    'X-Plex-Device-Vendor': string;
-    'X-Plex-Device-Name': string;
-    'X-Plex-Device-Screen-Resolution': string;
-    'X-Plex-Language': string;
-}
-
-interface PlexPin {
-    id: number;
-    code: string;
-}
+import { PlexHeaders, PlexPin } from "@/lib/types";
+import { getPlexPin, getPlexJWT } from "@/actions/plex/auth";
 
 const usePlexOAuth = () => {
     const plexHeaders = useRef<PlexHeaders>({
@@ -112,15 +94,8 @@ const usePlexOAuth = () => {
         loginPopup.current = null;
     };
 
-    const initializeLogin = () => {
-        openLoginPopup('Plex Auth', 700, 600);
-    };
-
     const getPin: () => Promise<void> = async (): Promise<void> => {
-        plexPin.current = await fetch('https://plex.tv/api/v2/pins?strong=true', {
-            method: 'POST',
-            headers: plexHeaders.current,
-        }).then(res => res.json());
+        plexPin.current = await getPlexPin(plexHeaders.current);
     }
 
     const encodeParams = (params: Record<string, string>): string => {
@@ -133,7 +108,7 @@ const usePlexOAuth = () => {
     const pollPlexPin = (): Promise<string> => {
         const executePoll = async (resolve: (plexAuthToken: string) => void, reject: (e: Error) => void) => {
             try {
-                const resp = await fetch(`https://plex.tv/api/v2/pins/${plexPin.current.id}`, {headers: plexHeaders.current}).then(res => res.json());
+                const resp = await getPlexJWT(plexPin.current.id, plexHeaders.current);
                 if (resp?.authToken) {
                     plexAuthToken.current = resp.authToken as string;
                     Cookies.set('plex_auth_token', plexAuthToken.current);
@@ -156,19 +131,23 @@ const usePlexOAuth = () => {
     }
 
     const login = async (): Promise<string> => {
-        setHeaders();
-        await getPin();
+        openLoginPopup('Plex Auth', 700, 600);
 
-        const params = getAuthParams();
+        setTimeout(async () => {
+            setHeaders();
+            await getPin();
 
-        if (loginPopup.current) {
-            loginPopup.current.location.href = `https://app.plex.tv/auth/#!?${encodeParams(params)}`;
-        }
+            const params = getAuthParams();
+
+            if (loginPopup.current) {
+                loginPopup.current.location.href = `https://app.plex.tv/auth/#!?${encodeParams(params)}`;
+            }
+        }, 2000);
 
         return pollPlexPin();
     }
 
-    return { plexAuthToken: plexAuthToken.current, login, initializeLogin };
+    return { login, plexAuthToken: plexAuthToken.current };
 }
 
 export default usePlexOAuth;
